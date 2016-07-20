@@ -22,16 +22,16 @@ mentors_data = [
 ]
 
 applicants_data = [
-    ['Dominique', 'Williams', 'Budapest'],
-    ['Jemima', 'Foreman', 'Miskolc'],
-    ['Zeph', 'Massey', 'Gödöllő'],
-    ['Joseph', 'Crawford', 'Buenos Aires'],
-    ['Ifeoma', 'Bird', 'Varsó'],
-    ['Arsenio', 'Matthews', 'Zakopane'],
-    ['Jemima', 'Cantu', 'Pécs'],
-    ['Carol', 'Arnold', 'Budapest'],
-    ['Jane', 'Forbes', 'Szeged'],
-    ['Ursa', 'William', 'Siófok']
+    ['Dominique', 'Williams', 8],
+    ['Jemima', 'Foreman', 9],
+    ['Zeph', 'Massey', 1],
+    ['Joseph', 'Crawford', 2],
+    ['Ifeoma', 'Bird', 3],
+    ['Arsenio', 'Matthews', 4],
+    ['Jemima', 'Cantu', 5],
+    ['Carol', 'Arnold', 8],
+    ['Jane', 'Forbes', 6],
+    ['Ursa', 'William', 7]
 ]
 
 
@@ -42,24 +42,18 @@ city_data = [
     ['Zakopane', 'Krakow'],
     ['Pécs', 'Budapest'],
     ['Szeged', 'Miskolc'],
-    ['Siófok', 'Budapest']]
+    ['Siófok', 'Budapest'],
+    ['Budapest', 'Budapest'],
+    ['Miskolc', 'Miskolc'],
+    ['Krakow', 'Krakow']]
 
 
 
-
-# change the datetime.date according how many days you want, i made 4
-a = 7
-for i in range(0,14):
-    a += 1
-    b = randint(1, 7)
-    InterviewSlot.create(date=datetime.date(2016, 8, 1), start=datetime.time(a,0), end=datetime.time(a+1), related_mentor=b)
-
-
-for data in schools_data:
-    School.create(name=data[0], location=data[1])
-for data in mentors_data:
-    Mentor.create(first_name=data[0], last_name=data[1], school=data[2])
+# for data in schools_data:
+#     School.create(name=data[0], location=data[1])
+# for data in mentors_data:
+#     Mentor.create(first_name=data[0], last_name=data[1], school=data[2])
 for data in applicants_data:
     Applicant.create(first_name=data[0], last_name=data[1], location=data[2])
-for data in city_data:
-    City.create(loc_examples=data[0], loc_school=data[1])
+# for data in city_data:
+#     City.create(loc_examples=data[0], loc_school=data[1])
