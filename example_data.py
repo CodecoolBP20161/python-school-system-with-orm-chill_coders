@@ -1,6 +1,8 @@
 # This script can generate example data for "City" and "InterviewSlot" models.
 
 from models import *
+import datetime
+from random import randint
 
 
 schools_data = [
@@ -41,6 +43,17 @@ city_data = [
     ['Pécs', 'Budapest'],
     ['Szeged', 'Miskolc'],
     ['Siófok', 'Budapest']]
+
+
+
+
+# change the datetime.date according how many days you want, i made 4
+a = 7
+for i in range(0,14):
+    a += 1
+    b = randint(1, 7)
+    InterviewSlot.create(date=datetime.date(2016, 8, 1), start=datetime.time(a,0), end=datetime.time(a+1), related_mentor=b)
+
 
 for data in schools_data:
     School.create(name=data[0], location=data[1])
