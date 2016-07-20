@@ -34,7 +34,7 @@ class Mentor(Person):
 class Applicant(Person):
     """Creates an applicant."""
     app_code = CharField(null=True, default=None)
-    location = CharField()
+    location = ForeignKeyField(City)
     status = CharField(default='new')
     i_slot = IntegerField(null=True, default=None)
 
