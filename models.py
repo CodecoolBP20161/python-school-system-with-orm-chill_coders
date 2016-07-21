@@ -35,7 +35,6 @@ class Mentor(Person):
     """Creates a Mentor."""
     school = ForeignKeyField(School)
 
-
     @staticmethod
     def show_closest_school():
         """Show specific (app_code) or all the applicants and their interview locations."""
@@ -61,6 +60,7 @@ class Mentor(Person):
         else:
             print('Invalid application code.')
 
+
 class Applicant(Person):
     """Creates an applicant."""
     app_code = CharField(null=True, default=None)
@@ -75,8 +75,8 @@ class Applicant(Person):
         application_code = input("Please enter your application code: ").upper().strip()
 
         if application_code in cls.app_code_list():
-           print("Valid application code.")
-           cls.application_code = application_code
+            print("Valid application code.")
+            cls.application_code = application_code
         else:
             print('Invalid application code.')
             exit()
