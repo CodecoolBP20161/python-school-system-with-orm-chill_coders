@@ -7,7 +7,7 @@ class Menu():
     def administrator_menu_loop():
         '''Administrator menu.'''
         admin_menu = OrderedDict([
-            ('1', Applicant.show_closest_school)
+            ('1', Mentor.show_closest_school)
         ])
         choice = None
         while choice != 'q':
@@ -22,8 +22,9 @@ class Menu():
     @staticmethod
     def applicant_menu_loop():
         '''Applicant menu.'''
+        Applicant.check_valid_code()
         applicant_menu = OrderedDict([
-            ('2', Applicant.display_student_status)
+            ('1', Applicant.display_student_status),
         ])
         choice = None
         while choice != 'q':

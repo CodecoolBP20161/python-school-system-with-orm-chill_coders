@@ -36,12 +36,50 @@ class Mentor(Person):
     school = ForeignKeyField(School)
 
 
+    @staticmethod
+    def show_closest_school():
+        """Show specific (app_code) or all the applicants and their interview locations."""
+
+        argv = input("Add an application code: ").upper().strip()
+
+        if len(argv) == 6:
+            try:
+                spec_applicant = Applicant.get(Applicant.app_code == argv)
+                print('According to the given application code, {0} {1}\'s interview location is: {2} '.format(
+                    spec_applicant.first_name,
+                    spec_applicant.last_name,
+                    spec_applicant.location.loc_school)
+                )
+            except:
+                print('Application code is not found.')
+        elif len(argv) == 0:
+            for applicant in Applicant.select():
+                print('{0} {1}\'s interview location is: {2} '.format(applicant.first_name,
+                                                                      applicant.last_name,
+                                                                      applicant.location.loc_school)
+                      )
+        else:
+            print('Invalid application code.')
+
 class Applicant(Person):
     """Creates an applicant."""
     app_code = CharField(null=True, default=None)
     location = ForeignKeyField(City)
     status = CharField(default='new')
     i_slot = IntegerField(null=True, default=None)
+
+    application_code = None
+
+    @classmethod
+    def check_valid_code(cls):
+        application_code = input("Please enter your application code: ").upper().strip()
+
+        if application_code in cls.app_code_list():
+           print("Valid application code.")
+           cls.application_code = application_code
+        else:
+            print('Invalid application code.')
+            exit()
 
     @staticmethod
     def app_code_list():
@@ -74,46 +112,16 @@ class Applicant(Person):
                                                                          applicant.last_name,
                                                                          applicant.app_code))
 
-    @staticmethod
-    def show_closest_school():
-        """Show specific (app_code) or all the applicants and their interview locations."""
+    @classmethod
+    def display_student_status(cls):
+        """Prints status belongs to the specific applicant."""
 
-        argv = input("Add an application code: ").upper().strip()
-
-        if len(argv) == 6:
-            try:
-                spec_applicant = Applicant.get(Applicant.app_code == argv)
-                print('According to the given application code, {0} {1}\'s interview location is: {2} '.format(
-                    spec_applicant.first_name,
-                    spec_applicant.last_name,
-                    spec_applicant.location.loc_school)
-                )
-            except:
-                print('Application code is not found.')
-        elif len(argv) == 0:
-            for applicant in Applicant.select():
-                print('{0} {1}\'s interview location is: {2} '.format(applicant.first_name,
-                                                                      applicant.last_name,
-                                                                      applicant.location.loc_school)
-                      )
-        else:
-            print('Invalid application code.')
-
-        @classmethod
-        def display_student_status(cls):
-            """Prints status belongs to the specific applicant."""
-
-            application_code = input("Add an application code: ").upper().strip()
-
-            try:
-                spec_applicant = cls.get(cls.app_code == application_code)
-                print('According to the given application code, your status is: {2} '.format(
-                    spec_applicant.first_name,
-                    spec_applicant.last_name,
-                    spec_applicant.status)
-                )
-            except:
-                print('Application code is not found.')
+        spec_applicant = cls.get(cls.app_code == cls.application_code)
+        print('According to the given application code, your status is: {2} '.format(
+            spec_applicant.first_name,
+            spec_applicant.last_name,
+            spec_applicant.status)
+        )
 
 
 class InterviewSlot(BaseModel):
