@@ -1,10 +1,10 @@
 from peewee import *
+import random
 
 # Configure your database connection here
 # database name = should be your username on your laptop
 # database user = should be your username on your laptop
-db = PostgresqlDatabase('TW_ORM_week6', user='dorasztanko')
-
+db = PostgresqlDatabase('sltw6', user='turbek')
 
 
 class BaseModel(Model):
@@ -12,24 +12,29 @@ class BaseModel(Model):
     class Meta:
         database = db
 
+
 class School(BaseModel):
     """Represents a newly generated class."""
     name = CharField(unique=True)
     location = CharField(unique=True)
+
 
 class City(BaseModel):
     """Matches cities with possible interview locations."""
     loc_examples = CharField(unique=True)
     loc_school = CharField()
 
+
 class Person(BaseModel):
     """Creates a person."""
     first_name = CharField()
     last_name = CharField()
 
+
 class Mentor(Person):
     """Creates a Mentor."""
     school = ForeignKeyField(School)
+
 
 class Applicant(Person):
     """Creates an applicant."""
@@ -38,6 +43,79 @@ class Applicant(Person):
     status = CharField(default='new')
     i_slot = IntegerField(null=True, default=None)
 
+    @staticmethod
+    def app_code_list():
+        app_code_list = [applicant.app_code for applicant in Applicant.select()]
+        return app_code_list
+
+    @classmethod
+    def app_code_generate(cls, appcodelist):
+        """Randomly generates unique application codes."""
+        chars = 'ABCDEFGHIJKLMNOPQRSTVWXYZ123456789'
+        done = False
+        while not done:
+            code = ''
+            for i in range(0, 6):
+                code += chars[random.randrange(0, len(chars))]
+            done = True
+            if code in appcodelist:
+                done = False
+        cls.app_code_list().append(code)
+        return code
+
+    @classmethod
+    def add_app_code(cls):
+        """Adds previously generated application codes if it is necessary."""
+        for applicant in cls.select():
+            if applicant.app_code is None:
+                applicant.app_code = cls.app_code_generate(cls.app_code_list())
+                applicant.save()
+                print("{} {} received a new application code: {}".format(applicant.first_name,
+                                                                         applicant.last_name,
+                                                                         applicant.app_code))
+
+    @staticmethod
+    def show_closest_school():
+        """Show specific (app_code) or all the applicants and their interview locations."""
+
+        argv = input("Add an application code: ").upper().strip()
+
+        if len(argv) == 6:
+            try:
+                spec_applicant = Applicant.get(Applicant.app_code == argv)
+                print('According to the given application code, {0} {1}\'s interview location is: {2} '.format(
+                    spec_applicant.first_name,
+                    spec_applicant.last_name,
+                    spec_applicant.location.loc_school)
+                )
+            except:
+                print('Application code is not found.')
+        elif len(argv) == 0:
+            for applicant in Applicant.select():
+                print('{0} {1}\'s interview location is: {2} '.format(applicant.first_name,
+                                                                      applicant.last_name,
+                                                                      applicant.location.loc_school)
+                      )
+        else:
+            print('Invalid application code.')
+
+        @classmethod
+        def display_student_status(cls):
+            """Prints status belongs to the specific applicant."""
+
+            application_code = input("Add an application code: ").upper().strip()
+
+            try:
+                spec_applicant = cls.get(cls.app_code == application_code)
+                print('According to the given application code, your status is: {2} '.format(
+                    spec_applicant.first_name,
+                    spec_applicant.last_name,
+                    spec_applicant.status)
+                )
+            except:
+                print('Application code is not found.')
+
+
 class InterviewSlot(BaseModel):
     """Creates interview intervals for applicants."""
     date = DateField()
@@ -45,5 +123,3 @@ class InterviewSlot(BaseModel):
     end = TimeField()
     reserved = BooleanField(default=False)
     related_mentor = ForeignKeyField(Mentor)
-
-
