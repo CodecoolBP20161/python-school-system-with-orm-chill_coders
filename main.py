@@ -36,7 +36,7 @@ def show_closest_school(*argv):
                 spec_applicant.last_name,
                 spec_applicant.location.loc_school)
             )
-        except ValueError:
+        except:
             print('Application code is not found.')
     else:
         for applicant in Applicant.select():
@@ -44,3 +44,5 @@ def show_closest_school(*argv):
                                                               applicant.last_name,
                                                               applicant.location.loc_school)
               )
+show_closest_school('sdvvds')
+
