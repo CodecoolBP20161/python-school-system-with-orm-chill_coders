@@ -4,7 +4,7 @@ import random
 # Configure your database connection here
 # database name = should be your username on your laptop
 # database user = should be your username on your laptop
-db = PostgresqlDatabase('sltw6', user='turbek')
+db = PostgresqlDatabase('twweek6', user='leviathan')
 
 
 class BaseModel(Model):
@@ -126,11 +126,39 @@ class Applicant(Person):
     def display_school_name(cls):
         """Shows the name of school belongs to the specific applicant."""
         obj = (School.select()
-              .join(City, on=School.location == City.loc_school)
-              .join(Applicant)
-              .where(cls.app_code == cls.application_code)
-              .get())
+               .join(City, on=School.location == City.loc_school)
+               .join(Applicant)
+               .where(cls.app_code == cls.application_code)
+               .get())
         print("School that you'll be visiting: {}".format(obj.name))
+
+    @classmethod
+    def reserve_interview(cls):
+        """Reserve an interview slot for new applicants"""
+        applicants_without_islot = []
+        for applicant in cls.select():
+            found = False
+            if applicant.i_slot is None:
+                possible_mentors = Mentor.select().join(School).where(School.location == applicant.location.loc_school)
+                for iview in InterviewSlot.select():
+                    if (not iview.reserved) and (Mentor.get(Mentor.id == iview.related_mentor) in possible_mentors):
+                        applicant.i_slot = iview.id
+                        applicant.status = "In progress"
+                        applicant.save()
+                        iview.reserved = True
+                        iview.related_applicant = applicant.app_code
+                        iview.save()
+                        found = True
+                        break
+            else:
+                found = True
+            if not found:
+                applicants_without_islot.append(applicant)
+        if len(applicants_without_islot) > 0:
+            print ("The following applicants could not get an interview due to the lack of slots:")
+            for applicant in applicants_without_islot:
+                print (applicant.first_name + " " + applicant.last_name + " " + applicant.app_code)
+
 
 class InterviewSlot(BaseModel):
     """Creates interview intervals for applicants."""
@@ -139,7 +167,4 @@ class InterviewSlot(BaseModel):
     end = TimeField()
     reserved = BooleanField(default=False)
     related_mentor = ForeignKeyField(Mentor)
-
-
-
-
+    related_applicant = CharField(null=True, default=None)

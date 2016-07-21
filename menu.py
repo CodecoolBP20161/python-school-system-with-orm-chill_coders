@@ -1,6 +1,7 @@
 from models import *
 from collections import OrderedDict
 
+
 class Menu():
 
     @staticmethod
