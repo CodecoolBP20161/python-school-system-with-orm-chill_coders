@@ -25,6 +25,7 @@ class Menu():
         Applicant.check_valid_code()
         applicant_menu = OrderedDict([
             ('1', Applicant.display_student_status),
+            ('2', Applicant.display_school_name)
         ])
         choice = None
         while choice != 'q':

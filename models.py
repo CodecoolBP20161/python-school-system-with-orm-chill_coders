@@ -4,7 +4,7 @@ import random
 # Configure your database connection here
 # database name = should be your username on your laptop
 # database user = should be your username on your laptop
-db = PostgresqlDatabase('sltw6', user='turbek')
+db = PostgresqlDatabase('TW_ORM_week6', user='dorasztanko')
 
 
 class BaseModel(Model):
@@ -115,13 +115,19 @@ class Applicant(Person):
     @classmethod
     def display_student_status(cls):
         """Prints status belongs to the specific applicant."""
-
         spec_applicant = cls.get(cls.app_code == cls.application_code)
         print('According to the given application code, your status is: {2} '.format(
             spec_applicant.first_name,
             spec_applicant.last_name,
             spec_applicant.status)
         )
+
+    @classmethod
+    def display_school_name(cls):
+        """Shows the name of school belongs to the specific applicant."""
+        # print(cls.select(School.name).location.join(City, on=City.id).join(School, on=School.location).where(
+        #     cls.app_code == cls.application_code))
+        # print(School.select().join(City, on=City.loc_school).join(cls).where(cls.app_code == cls.application_code).get())
 
 
 class InterviewSlot(BaseModel):
@@ -131,3 +137,7 @@ class InterviewSlot(BaseModel):
     end = TimeField()
     reserved = BooleanField(default=False)
     related_mentor = ForeignKeyField(Mentor)
+
+
+
+
