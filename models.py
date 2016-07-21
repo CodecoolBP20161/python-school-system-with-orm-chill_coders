@@ -4,7 +4,7 @@ import random
 # Configure your database connection here
 # database name = should be your username on your laptop
 # database user = should be your username on your laptop
-db = PostgresqlDatabase('TW_ORM_week6', user='dorasztanko')
+db = PostgresqlDatabase('sltw6', user='turbek')
 
 
 class BaseModel(Model):
@@ -125,10 +125,12 @@ class Applicant(Person):
     @classmethod
     def display_school_name(cls):
         """Shows the name of school belongs to the specific applicant."""
-        # print(cls.select(School.name).location.join(City, on=City.id).join(School, on=School.location).where(
-        #     cls.app_code == cls.application_code))
-        # print(School.select().join(City, on=City.loc_school).join(cls).where(cls.app_code == cls.application_code).get())
-
+        obj = (School.select()
+              .join(City, on=School.location == City.loc_school)
+              .join(Applicant)
+              .where(cls.app_code == cls.application_code)
+              .get())
+        print("School that you'll be visiting: {}".format(obj.name))
 
 class InterviewSlot(BaseModel):
     """Creates interview intervals for applicants."""
