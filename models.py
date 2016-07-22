@@ -35,38 +35,12 @@ class Mentor(Person):
     """Creates a Mentor."""
     school = ForeignKeyField(School)
 
-    @staticmethod
-    def show_closest_school():
-        """Show specific (app_code) or all the applicants and their interview locations."""
-
-        argv = input("Add an application code: ").upper().strip()
-
-        if len(argv) == 6:
-            try:
-                spec_applicant = Applicant.get(Applicant.app_code == argv)
-                print('According to the given application code, {0} {1}\'s interview location is: {2} '.format(
-                    spec_applicant.first_name,
-                    spec_applicant.last_name,
-                    spec_applicant.location.loc_school)
-                )
-            except:
-                print('Application code is not found.')
-        elif len(argv) == 0:
-            for applicant in Applicant.select():
-                print('{0} {1}\'s interview location is: {2} '.format(applicant.first_name,
-                                                                      applicant.last_name,
-                                                                      applicant.location.loc_school)
-                      )
-        else:
-            print('Invalid application code.')
-
 
 class Applicant(Person):
     """Creates an applicant."""
-    app_code = CharField(null=True, default=None)
+    app_code = CharField(unique=True, null=True)
     location = ForeignKeyField(City)
     status = CharField(default='new')
-    i_slot = IntegerField(null=True, default=None)
 
     application_code = None
 
@@ -114,7 +88,7 @@ class Applicant(Person):
 
     @classmethod
     def display_student_status(cls):
-        """Prints status belongs to the specific applicant."""
+        """Display the status of application."""
         spec_applicant = cls.get(cls.app_code == cls.application_code)
         print('According to the given application code, your status is: {2} '.format(
             spec_applicant.first_name,
@@ -124,7 +98,7 @@ class Applicant(Person):
 
     @classmethod
     def display_school_name(cls):
-        """Shows the name of school belongs to the specific applicant."""
+        """Display the name of the school of application."""
         obj = (School.select()
                .join(City, on=School.location == City.loc_school)
                .join(Applicant)
@@ -135,14 +109,13 @@ class Applicant(Person):
     @classmethod
     def reserve_interview(cls):
         """Reserve an interview slot for new applicants"""
-        applicants_without_islot = []
+        applicants_without_interview = []
         for applicant in cls.select():
             found = False
-            if applicant.i_slot is None:
+            if applicant.status == 'new':
                 possible_mentors = Mentor.select().join(School).where(School.location == applicant.location.loc_school)
                 for iview in InterviewSlot.select():
                     if (not iview.reserved) and (Mentor.get(Mentor.id == iview.related_mentor) in possible_mentors):
-                        applicant.i_slot = iview.id
                         applicant.status = "In progress"
                         applicant.save()
                         iview.reserved = True
@@ -153,11 +126,32 @@ class Applicant(Person):
             else:
                 found = True
             if not found:
-                applicants_without_islot.append(applicant)
-        if len(applicants_without_islot) > 0:
+                applicants_without_interview.append(applicant)
+        if len(applicants_without_interview) > 0:
             print("The following applicants could not get an interview due to the lack of slots:")
-            for applicant in applicants_without_islot:
+            for applicant in applicants_without_interview:
                 print(applicant.first_name + " " + applicant.last_name + " " + applicant.app_code)
+
+    @classmethod
+    def show_interview_details(cls):
+        """Display specific interview information."""
+        spec_applicant = cls.get(cls.app_code == cls.application_code)
+        obj_interview = (InterviewSlot.select()
+                                      .join(Applicant, on=InterviewSlot.related_applicant == Applicant.app_code)
+                                      .where(InterviewSlot.related_applicant == spec_applicant.app_code)
+                                      .get())
+        obj_school = (School.select()
+                            .join(City, on=School.location == City.loc_school)
+                            .join(Applicant)
+                            .where(cls.app_code == cls.application_code)
+                            .get())
+        obj_mentor = Mentor.get(Mentor.id == obj_interview.related_mentor)
+        print('Date: {}, {}-{}\nSchool: {}\nMentor: {} {}'.format(obj_interview.date,
+                                                                  obj_interview.start,
+                                                                  obj_interview.end,
+                                                                  obj_school.name,
+                                                                  obj_mentor.first_name,
+                                                                  obj_mentor.last_name))
 
 
 class InterviewSlot(BaseModel):

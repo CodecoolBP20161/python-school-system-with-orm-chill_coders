@@ -5,20 +5,20 @@ from collections import OrderedDict
 class Menu():
 
     @staticmethod
-    def administrator_menu_loop():
-        '''Administrator menu.'''
-        admin_menu = OrderedDict([
-            ('1', Mentor.show_closest_school)
+    def mentor_menu_loop():
+        '''Mentor menu.'''
+        mentor_menu = OrderedDict([
+            ('1', None)
         ])
         choice = None
         while choice != 'q':
             print("Press 'q' to exit menu")
-            for key, value in admin_menu.items():
+            for key, value in mentor_menu.items():
                 print("{}) {}".format(key, value.__doc__))
             choice = input("Choice: ").lower().strip()
 
-            if choice in admin_menu:
-                admin_menu[choice]()
+            if choice in mentor_menu:
+                mentor_menu[choice]()
 
     @staticmethod
     def applicant_menu_loop():
@@ -26,7 +26,8 @@ class Menu():
         Applicant.check_valid_code()
         applicant_menu = OrderedDict([
             ('1', Applicant.display_student_status),
-            ('2', Applicant.display_school_name)
+            ('2', Applicant.display_school_name),
+            ('3', Applicant.show_interview_details)
         ])
         choice = None
         while choice != 'q':
@@ -42,7 +43,7 @@ class Menu():
     def menu_loop(cls):
         '''Displays menu.'''
         menu = OrderedDict([
-            ('1', cls.administrator_menu_loop),
+            ('1', cls.mentor_menu_loop),
             ('2', cls.applicant_menu_loop)
         ])
         choice = None
