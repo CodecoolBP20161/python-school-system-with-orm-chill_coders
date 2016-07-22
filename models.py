@@ -130,7 +130,7 @@ class Applicant(Person):
                .join(Applicant)
                .where(cls.app_code == cls.application_code)
                .get())
-        print("School that you'll be visiting: {}".format(obj.name))
+        print("School that you'll be visiting: {}, {}".format(obj.location, obj.name))
 
 
 class InterviewSlot(BaseModel):
