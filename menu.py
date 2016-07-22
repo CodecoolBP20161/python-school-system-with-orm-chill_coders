@@ -5,22 +5,6 @@ from collections import OrderedDict
 class Menu():
 
     @staticmethod
-    def mentor_menu_loop():
-        '''Mentor menu.'''
-        mentor_menu = OrderedDict([
-            ('1', None)
-        ])
-        choice = None
-        while choice != 'q':
-            print("Press 'q' to exit menu")
-            for key, value in mentor_menu.items():
-                print("{}) {}".format(key, value.__doc__))
-            choice = input("Choice: ").lower().strip()
-
-            if choice in mentor_menu:
-                mentor_menu[choice]()
-
-    @staticmethod
     def applicant_menu_loop():
         '''Applicant menu.'''
         Applicant.check_valid_code()
@@ -43,8 +27,7 @@ class Menu():
     def menu_loop(cls):
         '''Displays menu.'''
         menu = OrderedDict([
-            ('1', cls.mentor_menu_loop),
-            ('2', cls.applicant_menu_loop)
+            ('1', cls.applicant_menu_loop)
         ])
         choice = None
         while choice != 'q':
