@@ -6,4 +6,4 @@ from models import *
 
 Applicant.add_app_code()
 Applicant.reserve_interview()
-# Menu.menu_loop()
+Menu.menu_loop()
