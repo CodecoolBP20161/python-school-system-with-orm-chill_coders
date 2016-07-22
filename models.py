@@ -81,9 +81,9 @@ class Applicant(Person):
             print('Invalid application code.')
             exit()
 
-    @classmethod
-    def app_code_list(cls):
-        app_code_list = [applicant.app_code for applicant in cls.select()]
+    @staticmethod
+    def app_code_list():
+        app_code_list = [applicant.app_code for applicant in Applicant.select()]
         return app_code_list
 
     @classmethod
@@ -126,12 +126,11 @@ class Applicant(Person):
     def display_school_name(cls):
         """Shows the name of school belongs to the specific applicant."""
         obj = (School.select()
-               .join(City, on=School.location == City.loc_school)
-               .join(Applicant)
-               .where(cls.app_code == cls.application_code)
-               .get())
-        print("School that you'll be visiting: {}, {}".format(obj.location, obj.name))
-
+              .join(City, on=School.location == City.loc_school)
+              .join(Applicant)
+              .where(cls.app_code == cls.application_code)
+              .get())
+        print("School that you'll be visiting: {}".format(obj.name))
 
 class InterviewSlot(BaseModel):
     """Creates interview intervals for applicants."""
@@ -140,3 +139,7 @@ class InterviewSlot(BaseModel):
     end = TimeField()
     reserved = BooleanField(default=False)
     related_mentor = ForeignKeyField(Mentor)
+
+
+
+
