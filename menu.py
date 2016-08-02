@@ -1,12 +1,12 @@
 from models import *
 from collections import OrderedDict
 
-
 class Menu():
 
     @staticmethod
     def administrator_menu_loop():
         '''Administrator menu.'''
+        print("---ADMINISTRATOR MENU---")
         administrator_menu = OrderedDict([
             ('1', Applicant.display_applicants)
         ])
@@ -23,6 +23,7 @@ class Menu():
     @staticmethod
     def applicant_menu_loop():
         '''Applicant menu.'''
+        print("---APPLICANT MENU---")
         Applicant.check_valid_code()
         applicant_menu = OrderedDict([
             ('1', Applicant.display_student_status),
