@@ -5,5 +5,7 @@ from models import *
 
 
 Applicant.add_app_code()
+Applicant.email_generator()
+Mentor.email_generator()
 Applicant.reserve_interview()
 Menu.menu_loop()

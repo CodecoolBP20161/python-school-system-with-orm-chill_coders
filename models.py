@@ -28,6 +28,23 @@ class Person(BaseModel):
     """Creates a person."""
     first_name = CharField()
     last_name = CharField()
+    email = CharField(null=True, default=None)
+
+    # for creating unique e-mail aliases
+    DIFF_NUM = 1
+
+
+    @classmethod
+    def email_generator(cls):
+        # email_address = 'joe.tester4321@gmail.com'
+
+        for person in cls.select():
+            if person.email is not None:
+                pass
+            else:
+                person.email = 'joe.tester4321+' + str(cls.DIFF_NUM) + '@gmail.com'
+                person.save()
+                cls.DIFF_NUM += 1
 
 
 class Mentor(Person):
