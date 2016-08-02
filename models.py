@@ -277,7 +277,7 @@ class Applicant(Person):
                               row.location.loc_school,
                               row.first_name,
                               row.last_name,
-                              Mentor.first_name,
+                              row.email,
                               School.select().where(School.location == row.location.loc_school).get().name,
                               Mentor.select().join(InterviewSlot)
                              .where(InterviewSlot.related_applicant == row.app_code)
