@@ -5,6 +5,7 @@
     2. save it as 'db_config.txt',
     3. put it into the same folder, where the application runs.
 
+
 ##### The file should include the next 2 personal piece of datas in separate rows:
 
     my_database_name
@@ -18,5 +19,8 @@
 
 
 ##### This file is ultimately going to be ignored by Git.
+
+    4. Please, install PrettyTable library with the following command:
+######sudo pip install prettytable
 
 ##### Thank you for your contribution!
