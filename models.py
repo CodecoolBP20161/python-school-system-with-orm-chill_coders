@@ -1,10 +1,9 @@
 from peewee import *
 import random
+from dbconnection import DbConnection
 
-# Configure your database connection here
-# database name = should be your username on your laptop
-# database user = should be your username on your laptop
-db = PostgresqlDatabase('sltw6', user='turbek')
+user_data = DbConnection.open_file('db_config.txt')
+db = PostgresqlDatabase(user_data[0].strip('\n'), user=user_data[1])
 
 
 class BaseModel(Model):
@@ -88,7 +87,7 @@ class Applicant(Person):
 
     @classmethod
     def display_student_status(cls):
-        """Display the status of application."""
+        """Displays the status of the given applicant."""
         spec_applicant = cls.get(cls.app_code == cls.application_code)
         print('According to the given application code, your status is: {2} '.format(
             spec_applicant.first_name,
@@ -98,7 +97,7 @@ class Applicant(Person):
 
     @classmethod
     def display_school_name(cls):
-        """Display the name of the school of application."""
+        """Displays the name of the school of the certain applicant."""
         obj = (School.select()
                .join(City, on=School.location == City.loc_school)
                .join(Applicant)
@@ -108,7 +107,7 @@ class Applicant(Person):
 
     @classmethod
     def reserve_interview(cls):
-        """Reserve an interview slot for new applicants"""
+        """Reserves an interview slot for new applicants"""
         applicants_without_interview = []
         for applicant in cls.select():
             found = False
@@ -134,7 +133,7 @@ class Applicant(Person):
 
     @classmethod
     def show_interview_details(cls):
-        """Display specific interview information."""
+        """Displays specific interview information."""
         spec_applicant = cls.get(cls.app_code == cls.application_code)
         obj_interview = (InterviewSlot.select()
                                       .join(Applicant, on=InterviewSlot.related_applicant == Applicant.app_code)
