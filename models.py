@@ -52,7 +52,6 @@ class Mentor(Person):
     """Creates a Mentor."""
     school = ForeignKeyField(School)
 
-
 class Applicant(Person):
     """Creates an applicant."""
     app_code = CharField(unique=True, null=True)
@@ -298,3 +297,5 @@ class InterviewSlot(BaseModel):
     reserved = BooleanField(default=False)
     related_mentor = ForeignKeyField(Mentor)
     related_applicant = CharField(null=True, default=None)
+
+
