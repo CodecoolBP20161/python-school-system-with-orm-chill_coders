@@ -204,7 +204,7 @@ class Applicant(Person):
                     print("Invalid input.")
                 Applicant.display_pretty_table("Applicants", "location", c)
             elif a == '4':
-                b = input("Full name: ").split(" ")
+                b = input("Full name: ")
                 Applicant.display_pretty_table("Applicants", "full name", b)
             elif a == '5':
                 b = input("Enter email: ")
@@ -221,7 +221,7 @@ class Applicant(Person):
                     print("Invalid input.")
                 Applicant.display_pretty_table("Applicants", "school", c)
             elif a == '7':
-                b = input("Mentor's name:").split(" ")
+                b = input("Mentor's name:")
                 Applicant.display_pretty_table("Applicants", "mentor", b)
             else:
                 print("Invalid input.")
@@ -254,7 +254,7 @@ class Applicant(Person):
                              .where(City.loc_school == filter)
         elif by == "full name":
             basic = Applicant.select()\
-                             .where(Applicant.first_name.contains(filter[0]) or Applicant.last_name.contains(filter[1]))
+                             .where(Applicant.first_name.contains(filter) | Applicant.last_name.contains(filter))
         elif by == "email":
             basic = Applicant.select().where(Applicant.email.contains(filter))
         elif by == "school":
@@ -266,7 +266,7 @@ class Applicant(Person):
             basic = Applicant.select()\
                              .join(InterviewSlot, on=Applicant.app_code == InterviewSlot.related_applicant)\
                              .join(Mentor)\
-                             .where(Mentor.first_name.contains(filter[0]) or Mentor.last_name.contains(filter[1]))
+                             .where(Mentor.first_name.contains(filter) | Mentor.last_name.contains(filter))
         for row in basic:
             headline.add_row([row.status,
                               InterviewSlot.select()
