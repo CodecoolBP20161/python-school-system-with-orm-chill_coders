@@ -1,10 +1,10 @@
 from peewee import *
 import random
+from dbconnection import DbConnection
+from prettytable import PrettyTable
 
-# Configure your database connection here
-# database name = should be your username on your laptop
-# database user = should be your username on your laptop
-db = PostgresqlDatabase('sltw6', user='turbek')
+user_data = DbConnection.open_file('db_config.txt')
+db = PostgresqlDatabase(user_data[0].strip('\n'), user=user_data[1])
 
 
 class BaseModel(Model):
@@ -29,12 +29,28 @@ class Person(BaseModel):
     """Creates a person."""
     first_name = CharField()
     last_name = CharField()
+    email = CharField(null=True, default=None)
+
+    # for creating unique e-mail aliases
+    DIFF_NUM = 1
+
+
+    @classmethod
+    def email_generator(cls):
+        # email_address = 'joe.tester4321@gmail.com'
+
+        for person in cls.select():
+            if person.email is not None:
+                pass
+            else:
+                person.email = 'joe.tester4321+' + str(cls.DIFF_NUM) + '@gmail.com'
+                person.save()
+                cls.DIFF_NUM += 1
 
 
 class Mentor(Person):
     """Creates a Mentor."""
     school = ForeignKeyField(School)
-
 
 class Applicant(Person):
     """Creates an applicant."""
@@ -88,7 +104,7 @@ class Applicant(Person):
 
     @classmethod
     def display_student_status(cls):
-        """Display the status of application."""
+        """Displays the status of the given applicant."""
         spec_applicant = cls.get(cls.app_code == cls.application_code)
         print('According to the given application code, your status is: {2} '.format(
             spec_applicant.first_name,
@@ -98,7 +114,7 @@ class Applicant(Person):
 
     @classmethod
     def display_school_name(cls):
-        """Display the name of the school of application."""
+        """Displays the name of the school of the certain applicant."""
         obj = (School.select()
                .join(City, on=School.location == City.loc_school)
                .join(Applicant)
@@ -108,7 +124,7 @@ class Applicant(Person):
 
     @classmethod
     def reserve_interview(cls):
-        """Reserve an interview slot for new applicants"""
+        """Reserves an interview slot for new applicants"""
         applicants_without_interview = []
         for applicant in cls.select():
             found = False
@@ -134,7 +150,7 @@ class Applicant(Person):
 
     @classmethod
     def show_interview_details(cls):
-        """Display specific interview information."""
+        """Displays specific interview information."""
         spec_applicant = cls.get(cls.app_code == cls.application_code)
         obj_interview = (InterviewSlot.select()
                                       .join(Applicant, on=InterviewSlot.related_applicant == Applicant.app_code)
@@ -153,6 +169,125 @@ class Applicant(Person):
                                                                   obj_mentor.first_name,
                                                                   obj_mentor.last_name))
 
+    @staticmethod
+    def display_applicants():
+        '''Display applicants.'''
+        Applicant.display_pretty_table("Applicants")
+        a = None
+        while a != 'q':
+            print("Press 'q' to exit menu.\nFilter by:")
+            print("1) Status    2) Time    3) Location   4) Full name   5) Email   6) School   7) Mentor")
+            a = input("Choice:")
+            if a == '1':
+                b = input("1) new\n2) In progress\n3) rejected\nChoice: ")
+                if b == '1':
+                    c = "new"
+                elif b == '2':
+                    c = "In progress"
+                elif b == '3':
+                    c = "rejected"
+                else:
+                    print("Invalid input.")
+                Applicant.display_pretty_table("Applicants", "status", c)
+            elif a == '2':
+                b = input("yyyy-mm-dd: ")
+                Applicant.display_pretty_table("Applicants", "time", b)
+            elif a == '3':
+                b = input("1) Budapest   2) Miskolc   3) Krakow\nChoice: ")
+                if b == '1':
+                    c = "Budapest"
+                elif b == '2':
+                    c = "Miskolc"
+                elif b == '3':
+                    c = "Krakow"
+                else:
+                    print("Invalid input.")
+                Applicant.display_pretty_table("Applicants", "location", c)
+            elif a == '4':
+                b = input("Full name: ").split(" ")
+                Applicant.display_pretty_table("Applicants", "full name", b)
+            elif a == '5':
+                b = input("Enter email: ")
+                Applicant.display_pretty_table("Applicants", "email", b)
+            elif a == '6':
+                b = input("1) CC_BP   2) CC_M   3) CC_K\nChoice:")
+                if b == '1':
+                    c = "CC_BP"
+                elif b == '2':
+                    c = "CC_M"
+                elif b == '3':
+                    c = "CC_K"
+                else:
+                    print("Invalid input.")
+                Applicant.display_pretty_table("Applicants", "school", c)
+            elif a == '7':
+                b = input("Mentor's name:").split(" ")
+                Applicant.display_pretty_table("Applicants", "mentor", b)
+            else:
+                print("Invalid input.")
+
+
+    @staticmethod
+    def display_pretty_table(table, by=None, filter=None):
+        if table == 'Applicants':
+            headline = PrettyTable(['Status',
+                                    'Time',
+                                    'Location',
+                                    'First name',
+                                    'Last name',
+                                    'Email',
+                                    'School',
+                                    'Mentor'
+                                    ])
+        if by == None:
+            basic = Applicant.select()
+        elif by == "status":
+            basic = Applicant.select().where(Applicant.status == filter)
+        elif by == "time":
+            basic = Applicant.select()\
+                             .join(InterviewSlot, on=InterviewSlot.related_applicant == Applicant.app_code)\
+                             .where(InterviewSlot.date == filter)
+        elif by == "location":
+            basic = Applicant.select()\
+                             .join(City)\
+                             .join(School, on=School.location == City.loc_school)\
+                             .where(City.loc_school == filter)
+        elif by == "full name":
+            basic = Applicant.select()\
+                             .where(Applicant.first_name.contains(filter[0]) or Applicant.last_name.contains(filter[1]))
+        elif by == "email":
+            basic = Applicant.select().where(Applicant.email.contains(filter))
+        elif by == "school":
+            basic = Applicant.select().select()\
+                                      .join(City)\
+                                      .join(School, on=School.location == City.loc_school)\
+                                      .where(School.name == filter)
+        elif by == "mentor":
+            basic = Applicant.select()\
+                             .join(InterviewSlot, on=Applicant.app_code == InterviewSlot.related_applicant)\
+                             .join(Mentor)\
+                             .where(Mentor.first_name.contains(filter[0]) or Mentor.last_name.contains(filter[1]))
+        for row in basic:
+            headline.add_row([row.status,
+                              InterviewSlot.select()
+                             .where(InterviewSlot.related_applicant == row.app_code)
+                             .get()
+                             .date,
+                              row.location.loc_school,
+                              row.first_name,
+                              row.last_name,
+                              row.email,
+                              School.select().where(School.location == row.location.loc_school).get().name,
+                              Mentor.select().join(InterviewSlot)
+                             .where(InterviewSlot.related_applicant == row.app_code)
+                             .get().first_name + " " +
+                              Mentor.select().join(InterviewSlot)
+                             .where(InterviewSlot.related_applicant == row.app_code)
+                             .get().last_name
+                              ])
+        print(headline)
+
+
 
 class InterviewSlot(BaseModel):
     """Creates interview intervals for applicants."""
@@ -162,3 +297,5 @@ class InterviewSlot(BaseModel):
     reserved = BooleanField(default=False)
     related_mentor = ForeignKeyField(Mentor)
     related_applicant = CharField(null=True, default=None)
+
+
