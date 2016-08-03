@@ -5,10 +5,11 @@ class Menu():
 
     @staticmethod
     def administrator_menu_loop():
-        '''Administrator menu.'''
+        """Administrator menu."""
         print("---ADMINISTRATOR MENU---")
         administrator_menu = OrderedDict([
-            ('1', Applicant.display_applicants)
+            ('1', Applicant.display_applicants),
+            ('2', InterviewSlot.display_interviews)
         ])
         choice = None
         while choice != 'q':
@@ -22,7 +23,7 @@ class Menu():
 
     @staticmethod
     def applicant_menu_loop():
-        '''Applicant menu.'''
+        """Applicant menu."""
         print("---APPLICANT MENU---")
         Applicant.check_valid_code()
         applicant_menu = OrderedDict([
@@ -42,7 +43,7 @@ class Menu():
 
     @classmethod
     def menu_loop(cls):
-        '''Displays menu.'''
+        """Displays menu."""
         menu = OrderedDict([
             ('1', cls.applicant_menu_loop),
             ('2', cls.administrator_menu_loop)
