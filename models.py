@@ -277,6 +277,34 @@ CC Staff
                     if (not iview.reserved) and (Mentor.get(Mentor.id == iview.related_mentor) in possible_mentors):
                         applicant.status = "In progress"
                         applicant.save()
+
+                        message = """
+                        Dear {0}!
+
+                        The next step in your Codecool application process is just on your doorstep!
+                        We have scheduled an interview slot for your.
+
+                        Details:
+
+                        Location: {1}
+                        Related mentor's name: {2}
+                        Date: {3}
+                        Time/start: {4}
+                        Time/end: {5}
+
+                        We're really looking forward to meeting with you!
+
+                        Yours sincerely,
+                        CC Staff
+                        """.format(applicant.full_name,
+                                   applicant.location.loc_school,
+                                   'kiscica',
+                                   "2",
+                                   "3",
+                                   "4")
+                        emailsender = EmailSender(email_receiver=applicant.email, text=message)
+                        emailsender.sending()
+
                         iview.reserved = True
                         iview.related_applicant = applicant.app_code
                         iview.save()
