@@ -285,7 +285,41 @@ CC Staff
                         iview.related_applicant = applicant.app_code
                         iview.save()
                         found = True
+
+                        message = """
+                        Dear {0}!
+
+                        The next step in your Codecool application process is just on your doorstep!
+                        We have scheduled an interview slot for your.
+
+                        Details:
+
+                        Location: {1}
+                        Related mentor's name: {2}
+                        Date: {3}
+                        Time/start: {4}
+                        Time/end: {5}
+
+                        We're really looking forward to meeting with you!
+
+                        Yours sincerely,
+                        CC Staff
+                        """.format(applicant.full_name,
+                                   applicant.location.loc_school,
+                                   Mentor.select().join(InterviewSlot)
+                                   .where(InterviewSlot.related_applicant == applicant.app_code).get().first_name + " " +
+                                   Mentor.select().join(InterviewSlot).where(InterviewSlot.related_applicant == applicant.app_code).get().last_name,
+                                   InterviewSlot.select().where(InterviewSlot.related_applicant == applicant.app_code).get().date,
+                                   InterviewSlot.select().where(InterviewSlot.related_applicant == applicant.app_code).get().start,
+                                   InterviewSlot.select().where(InterviewSlot.related_applicant == applicant.app_code).get().end,
+                                   )
+                        emailsender = EmailSender(email_receiver=applicant.email, text=message)
+                        emailsender.sending()
+                        print("{0}\'s just received an interview slot.".format(applicant.full_name))
+
                         break
+
+
             else:
                 found = True
             if not found:
