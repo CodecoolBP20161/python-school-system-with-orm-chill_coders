@@ -2,13 +2,14 @@ from peewee import *
 import random
 from dbconnection import DbConnection
 from prettytable import PrettyTable
+from emailsender import *
 
 user_data = DbConnection.open_file('db_config.txt')
 db = PostgresqlDatabase(user_data[0].strip('\n'), user=user_data[1])
 
 
 class BaseModel(Model):
-    """A base model that will use our Postgresql database"""
+    """A base model that will use our Postgresql database."""
     class Meta:
         database = db
 
@@ -30,6 +31,10 @@ class Person(BaseModel):
     first_name = CharField()
     last_name = CharField()
     email = CharField(null=True, default=None)
+
+    @property
+    def full_name(self):
+        return self.first_name + ' ' + self.last_name
 
     # for creating unique e-mail aliases
     DIFF_NUM = 1
@@ -224,6 +229,25 @@ class Applicant(Person):
                 print("{} {} received a new application code: {}".format(applicant.first_name,
                                                                          applicant.last_name,
                                                                          applicant.app_code))
+                message = """
+Dear {0}!
+
+We gladly received your application. First of all, we have generated a personal application code for you. Here it is:
+{1}.
+
+If everything goes fine with your application process, you're going to be informed about your interview's details soon.
+One thing for sure, it is probably going to be held in {2}.
+
+We're looking forward to meeting with you!
+
+Yours sincerely,
+CC Staff
+""".format(applicant.full_name, applicant.app_code, applicant.location.loc_school)
+                emailsender = EmailSender(email_receiver=applicant.email, text=message)
+                emailsender.sending()
+            else:
+                pass
+
 
     @classmethod
     def display_student_status(cls):
@@ -247,7 +271,7 @@ class Applicant(Person):
 
     @classmethod
     def reserve_interview(cls):
-        """Reserves an interview slot for new applicants"""
+        """Reserves an interview slot for new applicants."""
         applicants_without_interview = []
         for applicant in cls.select():
             found = False
@@ -439,7 +463,6 @@ class InterviewSlot(BaseModel):
                                          Mentor.first_name.concat(" ").concat(Mentor.last_name),
                                          InterviewSlot.date).join(Mentor).join(School)\
                                         .where(InterviewSlot.related_applicant != None, filters).tuples()
-
         for row in basic:
             headline.add_row(row)
         print(headline)
