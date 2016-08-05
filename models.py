@@ -281,6 +281,10 @@ CC Staff
                     if (not iview.reserved) and (Mentor.get(Mentor.id == iview.related_mentor) in possible_mentors):
                         applicant.status = "In progress"
                         applicant.save()
+                        iview.reserved = True
+                        iview.related_applicant = applicant.app_code
+                        iview.save()
+                        found = True
 
                         message = """
                         Dear {0}!
@@ -302,18 +306,20 @@ CC Staff
                         CC Staff
                         """.format(applicant.full_name,
                                    applicant.location.loc_school,
-                                   'kiscica',
-                                   "2",
-                                   "3",
-                                   "4")
+                                   Mentor.select().join(InterviewSlot)
+                                   .where(InterviewSlot.related_applicant == applicant.app_code).get().first_name + " " +
+                                   Mentor.select().join(InterviewSlot).where(InterviewSlot.related_applicant == applicant.app_code).get().last_name,
+                                   InterviewSlot.select().where(InterviewSlot.related_applicant == applicant.app_code).get().date,
+                                   InterviewSlot.select().where(InterviewSlot.related_applicant == applicant.app_code).get().start,
+                                   InterviewSlot.select().where(InterviewSlot.related_applicant == applicant.app_code).get().end,
+                                   )
                         emailsender = EmailSender(email_receiver=applicant.email, text=message)
                         emailsender.sending()
+                        print("{0}\'s just received an interview slot.".format(applicant.full_name))
 
-                        iview.reserved = True
-                        iview.related_applicant = applicant.app_code
-                        iview.save()
-                        found = True
                         break
+
+
             else:
                 found = True
             if not found:
