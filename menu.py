@@ -2,7 +2,7 @@ from models import *
 from collections import OrderedDict
 
 
-class Menu():
+class Menu:
 
     @staticmethod
     def administrator_menu_loop():
