@@ -91,5 +91,5 @@ ENV/
 # Ignore .idea directory
 .idea
 
-# username and database name for db_config
-db_config.txt
+# username, database name, email address and password for configuration
+config.json
