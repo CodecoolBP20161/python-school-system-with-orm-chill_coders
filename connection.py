@@ -22,7 +22,6 @@ class Connection(object):
 
         else:
             try:
-                print(False)
                 self.database_user = input('Please, add your user name to config.json: ')
                 self.database_name = input('Database name: ')
                 self.email_address = input('Email address: ')
