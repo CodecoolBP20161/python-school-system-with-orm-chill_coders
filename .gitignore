@@ -93,3 +93,7 @@ ENV/
 
 # username, database name, email address and password for configuration
 config.json
+
+# ignoring virtualenvironment
+wenv/
+
