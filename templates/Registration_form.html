@@ -1,0 +1,26 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registration form</title>
+</head>
+<body>
+    <h1>Registration form for new applicants</h1>
+    <h2>Please fill the fields below</h2>
+    <form action="/registration" method="post">
+        <p>First name</p>
+        <p><input type="text" name="first_name"></p>
+        <p>Last name</p>
+        <p><input type="text" name="last_name"></p>
+        <p>Location</p>
+        <select>
+            {% for city in cities %}
+                <option value={{ city.num }}>{{ city.name }}</option>
+            {% endfor %}
+        </select>
+        <p>e-mail address</p>
+        <p><input type="text" name="e_mail"></p>
+        <p><input type="submit" value="Submit"></p>
+    </form>
+</body>
+</html>

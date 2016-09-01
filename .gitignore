@@ -93,3 +93,6 @@ ENV/
 
 # username and database name for db_config
 db_config.txt
+
+#ignoring virtualenvironment
+wenv/
