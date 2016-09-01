@@ -96,45 +96,37 @@ class Mentor(Person):
     @classmethod
     def display_mentor_interviews(cls):
         """Display interviews."""
+
+        # data for submenu handling filters
+        options = [['1', 'yyyy-mm-dd: '],
+                   ['2', "hh:mm: "],
+                   ['3', "hh:mm: "],
+                   ['4', "Application code: "],
+                   ['5', "Name: "]]
         try:
             Mentor.display_pretty_table_mentor_interview()
-
             a = None
             while a != 'q':
                 print("Press 'q' to exit menu.\nFilter by:")
                 print("1) Date    2) Start    3) End   4) Application code   5) Name")
-                a = input("Choice:")
-                if a == '1':
-                    try:
-                        b = input("yyyy-mm-dd: ")
-                        Mentor.display_pretty_table_mentor_interview(InterviewSlot.date == b)
-                    except (DataError, InternalError):
-                        print('Invalid input.')
-                elif a == '2':
-                    try:
-                        b = input("hh:mm: ")
-                        Mentor.display_pretty_table_mentor_interview(InterviewSlot.start == b)
-                    except (DataError, InternalError):
-                        print('Invalid input.')
-                elif a == '3':
-                    try:
-                        b = input("hh:mm: ")
-                        Mentor.display_pretty_table_mentor_interview(InterviewSlot.end == b)
-                    except (DataError, InternalError):
-                        print("Invalid input.")
-                elif a == '4':
-                    try:
-                        b = input("Application code: ")
-                        Mentor.display_pretty_table_mentor_interview(InterviewSlot.related_applicant.contains(b))
-                    except (DataError, InternalError):
-                        print("Invalid input.")
-                elif a == '5':
-                    try:
-                        b = input("Name: ")
-                        Mentor.display_pretty_table_mentor_interview(Applicant.first_name.contains(b) |
-                                                                     Applicant.last_name.contains(b))
-                    except (DataError, InternalError):
-                        print("Invalid input.")
+                a = input("Choice: ")
+                try:
+                    for option in options:
+                        if a == option[0]:
+                            b = input(option[1])
+                            if a == '1':
+                                Mentor.display_pretty_table_mentor_interview(InterviewSlot.date == b)
+                            elif a == '2':
+                                Mentor.display_pretty_table_mentor_interview(InterviewSlot.start == b)
+                            elif a == '3':
+                                Mentor.display_pretty_table_mentor_interview(InterviewSlot.end.contains(b))
+                            elif a == '4':
+                                Mentor.display_pretty_table_mentor_interview(InterviewSlot.related_applicant.contains(b))
+                            elif a == '5':
+                                Mentor.display_pretty_table_mentor_interview(Applicant.first_name.contains(b) |
+                                                                             Applicant.last_name.contains(b))
+                except (DataError, InternalError):
+                    print("Invalid input.")
         except Applicant.DoesNotExist:
             print("No scheduled interview.")
 
@@ -337,7 +329,7 @@ class Applicant(Person):
         while a != 'q':
             print("Press 'q' to exit menu.\nFilter by:")
             print("1) Status    2) Time    3) Location   4) Full name   5) Email   6) School   7) Mentor")
-            a = input("Choice:")
+            a = input("Choice: ")
             if a == '1':
                 b = input("1) new\n2) In progress\n3) rejected\nChoice: ")
                 try:
@@ -376,7 +368,7 @@ class Applicant(Person):
                 b = input("Enter email: ")
                 Applicant.display_pretty_table_applicants(Applicant.email.contains(b))
             elif a == '6':
-                b = input("1) CC_BP   2) CC_M   3) CC_K\nChoice:")
+                b = input("1) CC_BP   2) CC_M   3) CC_K\nChoice: ")
                 try:
                     if b == '1':
                         c = "CC_BP"
@@ -427,7 +419,7 @@ class InterviewSlot(BaseModel):
         while a != 'q':
             print("Press 'q' to exit menu.\nFilter by:")
             print("1) School    2) Application code    3) Mentor   4) Date")
-            a = input("Choice:")
+            a = input("Choice: ")
             if a == '1':
                 b = input("1) CC_BP\n2) CC_M\n3) CC_K\nChoice: ")
                 try:
