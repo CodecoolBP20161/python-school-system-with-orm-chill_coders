@@ -32,7 +32,7 @@ def reg_confirmation():
         if a[:] == [True, True, True]:
             Applicant.create(first_name=request.form['first_name'], last_name=request.form['last_name'], location=request.form['location'],
                              email=request.form['e_mail'])
-            return render_template('/')
+            return redirect('/')
         else:
             return render_template('Registration_form.html', cities=cities, error=True, valid=a, words=b)
     else:

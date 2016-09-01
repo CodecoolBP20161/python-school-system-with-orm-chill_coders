@@ -2,10 +2,7 @@ class Check:
 
     @staticmethod
     def namecheck(name):
-        check = name.isalpha()
-        if name[0].islower():
-            check = False
-        return check
+        return len(name) > 0 and name.isalpha() and not name[0].islower()
 
     @staticmethod
     def emailcheck(e_mail):

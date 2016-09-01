@@ -37,7 +37,7 @@
                             name="first_name"
                             value="{{ words[0] }}"
                             {% if not valid[0] %} style="color:red;" {% endif %}>
-                    {% if not valid[0] %} First letter should be capital! {% endif %}
+                    {% if not valid[0] %} First letter should be capital, use letters only! {% endif %}
                 </p>
 
             <p>Last name</p>
@@ -47,7 +47,7 @@
                             name="last_name"
                             value="{{ words[1] }}"
                             {% if not valid[1] %} style="color:red;" {% endif %} >
-                    {% if not valid[1] %} First letter should be capital! {% endif %}
+                    {% if not valid[1] %} First letter should be capital, use letters only! {% endif %}
                 </p>
 
             <p>Location</p>
@@ -66,7 +66,7 @@
                             name="e_mail"
                             value="{{ words[2] }}"
                             {% if not valid[2] %} style="color:red;" {% endif %} >
-                    {% if not valid[1] %} This is not a valid e-mail address! {% endif %}
+                    {% if not valid[2] %} This is not a valid e-mail address! {% endif %}
                 </p>
             <p><input type="submit" value="Submit"></p>
         {% endif %}
