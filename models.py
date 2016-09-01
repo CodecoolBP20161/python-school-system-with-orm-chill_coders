@@ -1,11 +1,11 @@
+from connection import Connection
 from peewee import *
 import random
-from dbconnection import DbConnection
 from prettytable import PrettyTable
 from emailsender import *
 
-user_data = DbConnection.open_file('db_config.txt')
-db = PostgresqlDatabase(user_data[0].strip('\n'), user=user_data[1])
+connection = Connection()
+db = PostgresqlDatabase(connection.database_name, user=connection.database_user)
 
 
 class BaseModel(Model):
@@ -42,7 +42,6 @@ class Person(BaseModel):
     @classmethod
     def email_generator(cls):
         """Generates random e-mail addresses for default applicants."""
-        # email_address = 'testerzh1234@gmail.com'
 
         for person in cls.select():
             if person.email is not None:
@@ -243,7 +242,10 @@ We're looking forward to meeting with you!
 Yours sincerely,
 CC Staff
 """.format(applicant.full_name, applicant.app_code, applicant.location.loc_school)
-                emailsender = EmailSender(email_receiver=applicant.email, text=message)
+                emailsender = EmailSender(email_receiver=applicant.email,
+                                          text=message,
+                                          email_address=connection.email_address,
+                                          email_password=connection.email_password)
                 emailsender.sending()
             else:
                 pass
@@ -313,7 +315,10 @@ CC Staff
                                    InterviewSlot.select().where(InterviewSlot.related_applicant == applicant.app_code).get().start,
                                    InterviewSlot.select().where(InterviewSlot.related_applicant == applicant.app_code).get().end,
                                    )
-                        emailsender = EmailSender(email_receiver=applicant.email, text=message)
+                        emailsender = EmailSender(email_receiver=applicant.email,
+                                                  text=message,
+                                                  email_address=connection.email_address,
+                                                  email_password=connection.email_password)
                         emailsender.sending()
                         print("{0}\'s just received an interview slot.".format(applicant.full_name))
 
