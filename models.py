@@ -60,9 +60,8 @@ class Mentor(Person):
     mentor = None
 
     @classmethod
-    def check_valid_mentor(cls):
-        print("Press 'q' to exit!")
-        mentor_name = input("Enter name: ")
+    def check_valid_mentor(cls, mentor_input):
+        mentor_name = mentor_input
         av_mentors = {}
         i = 0
         for name in cls.mentor_name_list():
@@ -91,7 +90,7 @@ class Mentor(Person):
 
     @staticmethod
     def mentor_name_list():
-        mentor_name_list = [mentor.first_name + " " + mentor.last_name for mentor in Mentor.select()]
+        mentor_name_list = [mentor.full_name for mentor in Mentor.select()]
         return mentor_name_list
 
     @classmethod
@@ -225,28 +224,21 @@ class Applicant(Person):
             if applicant.app_code is None:
                 applicant.app_code = cls.app_code_generate(cls.app_code_list())
                 applicant.save()
-                print("{} {} received a new application code: {}".format(applicant.first_name,
-                                                                         applicant.last_name,
-                                                                         applicant.app_code))
-                message = """
-Dear {0}!
+                print("{} received a new application code: {}".format(applicant.full_name,
+                                                                      applicant.app_code))
 
-We gladly received your application. First of all, we have generated a personal application code for you. Here it is:
-{1}.
+                # list of personal data to fill in the appropriate email messages
+                data_for_email = [applicant.full_name,
+                                  applicant.app_code,
+                                  applicant.location.loc_school]
 
-If everything goes fine with your application process, you're going to be informed about your interview's details soon.
-One thing for sure, it is probably going to be held in {2}.
-
-We're looking forward to meeting with you!
-
-Yours sincerely,
-CC Staff
-""".format(applicant.full_name, applicant.app_code, applicant.location.loc_school)
-                emailsender = EmailSender(email_receiver=applicant.email,
-                                          text=message,
-                                          email_address=connection.email_address,
-                                          email_password=connection.email_password)
-                emailsender.sending()
+                # sending email process' just started
+                emailing_1 = EmailSender(email_receiver=applicant.email,
+                                         email_address=connection.email_address,
+                                         email_password=connection.email_password,
+                                         specialisation=data_for_email)
+                emailing_1.sending(emailing_1.create_email_text('applicant_start_email'))
+                emailing_1.end_of_sending_process()
             else:
                 pass
 
@@ -288,43 +280,25 @@ CC Staff
                         iview.save()
                         found = True
 
-                        message = """
-                        Dear {0}!
+                        # email sending process starts here
+                        data_for_email = [
+                            applicant.full_name,
+                            applicant.location.loc_school,
+                            Mentor.select().join(InterviewSlot)
+                            .where(InterviewSlot.related_applicant == applicant.app_code).get().first_name + " " +
+                            Mentor.select().join(InterviewSlot).where(InterviewSlot.related_applicant == applicant.app_code).get().last_name,
+                            InterviewSlot.select().where(InterviewSlot.related_applicant == applicant.app_code).get().date,
+                            InterviewSlot.select().where(InterviewSlot.related_applicant == applicant.app_code).get().start,
+                            InterviewSlot.select().where(InterviewSlot.related_applicant == applicant.app_code).get().end]
 
-                        The next step in your Codecool application process is just on your doorstep!
-                        We have scheduled an interview slot for your.
-
-                        Details:
-
-                        Location: {1}
-                        Related mentor's name: {2}
-                        Date: {3}
-                        Time/start: {4}
-                        Time/end: {5}
-
-                        We're really looking forward to meeting with you!
-
-                        Yours sincerely,
-                        CC Staff
-                        """.format(applicant.full_name,
-                                   applicant.location.loc_school,
-                                   Mentor.select().join(InterviewSlot)
-                                   .where(InterviewSlot.related_applicant == applicant.app_code).get().first_name + " " +
-                                   Mentor.select().join(InterviewSlot).where(InterviewSlot.related_applicant == applicant.app_code).get().last_name,
-                                   InterviewSlot.select().where(InterviewSlot.related_applicant == applicant.app_code).get().date,
-                                   InterviewSlot.select().where(InterviewSlot.related_applicant == applicant.app_code).get().start,
-                                   InterviewSlot.select().where(InterviewSlot.related_applicant == applicant.app_code).get().end,
-                                   )
-                        emailsender = EmailSender(email_receiver=applicant.email,
-                                                  text=message,
-                                                  email_address=connection.email_address,
-                                                  email_password=connection.email_password)
-                        emailsender.sending()
-                        print("{0}\'s just received an interview slot.".format(applicant.full_name))
+                        emailing_2 = EmailSender(email_receiver=applicant.email,
+                                                 email_address=connection.email_address,
+                                                 email_password=connection.email_password,
+                                                 specialisation=data_for_email)
+                        emailing_2.sending(emailing_2.create_email_text('applicant_interview_email'))
+                        emailing_2.end_of_sending_process()
 
                         break
-
-
             else:
                 found = True
             if not found:
