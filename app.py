@@ -1,5 +1,6 @@
 from flask import Flask, request, flash, redirect, url_for, render_template
 from models import *
+from checker import Check
 
 app = Flask(__name__)
 
@@ -24,12 +25,18 @@ def index():
 # Displaying registration form
 @app.route('/registration', methods=['GET', 'POST'])
 def reg_confirmation():
+    cities = City.select()
     if request.method == "POST":
-        Applicant.create(first_name=request.form['fname'], last_name=request.form['lname'], location=request.form['location'],
-                         email=request.form['email'])
-        return redirect('/')
+        b = (request.form['first_name'], request.form['last_name'], request.form['e_mail'], request.form['location'])
+        a = Check.checker(b[0], b[1], b[2])
+        if a[:] == [True, True, True]:
+            Applicant.create(first_name=request.form['first_name'], last_name=request.form['last_name'], location=request.form['location'],
+                             email=request.form['e_mail'])
+            return render_template('/')
+        else:
+            return render_template('Registration_form.html', cities=cities, error=True, valid=a, words=b)
     else:
-        return render_template('regform.html')
+        return render_template('Registration_form.html', cities=cities, error=False)
 
 if __name__ == '__main__':
     app.run()

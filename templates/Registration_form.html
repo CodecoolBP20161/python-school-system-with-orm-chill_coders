@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,19 +7,69 @@
     <h1>Registration form for new applicants</h1>
     <h2>Please fill the fields below</h2>
     <form action="/registration" method="post">
+
+<!--Here starts the block with no error!-->
+        {% if not error %}
+
         <p>First name</p>
-        <p><input type="text" name="first_name"></p>
+            <p><input type="text" name="first_name"></p>
         <p>Last name</p>
-        <p><input type="text" name="last_name"></p>
+            <p><input type="text" name="last_name"></p>
         <p>Location</p>
-        <select>
+        <select name="location">
             {% for city in cities %}
-                <option value={{ city.num }}>{{ city.name }}</option>
+                <option value="{{ city.id }}">{{ city.loc_examples }}</option>
             {% endfor %}
         </select>
-        <p>e-mail address</p>
-        <p><input type="text" name="e_mail"></p>
+        <p>E-mail address</p>
+            <p><input type="text" name="e_mail"></p>
         <p><input type="submit" value="Submit"></p>
+
+        {% endif %}
+<!--Here ends the block with no error!-->
+
+<!--Here starts the block if there's some error!-->
+        {% if error %}
+            <p>First name</p>
+                <p>
+                    <input
+                            type="text"
+                            name="first_name"
+                            value="{{ words[0] }}"
+                            {% if not valid[0] %} style="color:red;" {% endif %}>
+                    {% if not valid[0] %} First letter should be capital! {% endif %}
+                </p>
+
+            <p>Last name</p>
+                <p>
+                    <input
+                            type="text"
+                            name="last_name"
+                            value="{{ words[1] }}"
+                            {% if not valid[1] %} style="color:red;" {% endif %} >
+                    {% if not valid[1] %} First letter should be capital! {% endif %}
+                </p>
+
+            <p>Location</p>
+            <select name="location">
+                {% for city in cities %}
+                    <option
+                            value="{{ city.id }}" {% if city.id == words[3]|int %} selected {% endif %}>
+                        {{ city.loc_examples }}
+                    </option>
+                {% endfor %}
+            </select>
+            <p>E-mail address</p>
+                <p>
+                    <input
+                            type="text"
+                            name="e_mail"
+                            value="{{ words[2] }}"
+                            {% if not valid[2] %} style="color:red;" {% endif %} >
+                    {% if not valid[1] %} This is not a valid e-mail address! {% endif %}
+                </p>
+            <p><input type="submit" value="Submit"></p>
+        {% endif %}
     </form>
 </body>
 </html>

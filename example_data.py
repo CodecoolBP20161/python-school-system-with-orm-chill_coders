@@ -49,8 +49,8 @@ city_data = [
 ]
 
 
-for data in schools_data:
-    School.create(name=data[0], location=data[1])
+# for data in schools_data:
+#     School.create(name=data[0], location=data[1])
 for data in city_data:
     City.create(loc_examples=data[0], loc_school=data[1])
 for data in mentors_data:
