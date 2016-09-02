@@ -1,0 +1,5 @@
+Flask==0.11.1
+peewee==2.8.3
+prettytable==0.7.2
+psycopg2==2.6.2
+request==0.0.0
