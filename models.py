@@ -461,13 +461,13 @@ class InterviewSlot(BaseModel):
                                          InterviewSlot.related_applicant,
                                          Mentor.first_name.concat(" ").concat(Mentor.last_name),
                                          InterviewSlot.date).join(Mentor).join(School)\
-                                        .where(InterviewSlot.related_applicant is not None).tuples()
+                                        .where(InterviewSlot.related_applicant != None).tuples()
         else:
             basic = InterviewSlot.select(School.name,
                                          InterviewSlot.related_applicant,
                                          Mentor.first_name.concat(" ").concat(Mentor.last_name),
                                          InterviewSlot.date).join(Mentor).join(School)\
-                                        .where(InterviewSlot.related_applicant is not None, filters).tuples()
+                                        .where(InterviewSlot.related_applicant != None, filters).tuples()
         for row in basic:
             headline.add_row(row)
         print(headline)

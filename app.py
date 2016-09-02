@@ -22,26 +22,26 @@ def _db_close(exc):
 
 @app.route('/')
 def index():
-    return 'Job is done! Check your database!'
+    return redirect("https://media.giphy.com/media/10Shl99Vghh5aU/giphy.gif")
 
 
-# Displaying registration form
 @app.route('/registration', methods=['GET', 'POST'])
 def reg_confirmation():
+    """Displays and edits registration form"""
     cities = City.select()
     if request.method == "POST":
         b = (request.form['first_name'], request.form['last_name'], request.form['e_mail'], request.form['location'])
         a = Check.checker(b[0], b[1], b[2])
-        if a[:] == [True, True, True]:
+        if a[:] == [True, True, True]:  # GOOD FORM, CREATES NEW FORM
             Applicant.create(first_name=request.form['first_name'],
                              last_name=request.form['last_name'],
                              location=request.form['location'],
                              email=request.form['e_mail'])
             return redirect('/')
-        else:
-            return render_template('Registration_form.html', cities=cities, error=True, valid=a, words=b)
-    else:
-        return render_template('Registration_form.html', cities=cities, error=False)
+        else:  # ERROR IN CHECKER, RETURNS REG.FORM TEMPLATE WITH ERRORS
+            return render_template('registration_form.html', cities=cities, error=True, valid=a, words=b)
+    else:  # GET
+        return render_template('registration_form.html', cities=cities, error=False)
 
 if __name__ == '__main__':
     app.run()
