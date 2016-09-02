@@ -1,26 +1,13 @@
 ##### Dear User!
 
-##### Before running the application,
-    1. make a simple text file,
-    2. save it as 'db_config.txt',
-    3. put it into the same folder, where the application runs.
+##### Before running the application, use the the following command to install the necessary modules:
 
+> pip install requirements.txt
 
-##### The file should include the next 2 personal piece of datas in separate rows:
+##### As a first user, the app will make a config.json.
 
-    my_database_name
-    my_user_name
+##### This file includes your user name, database name, email address /as a sender/ and password. Please, do not make any mistake during inserting these data elements.
 
-##### Example:
+##### If it happens, modify them manually in config.json, otherwise you get an error all the time.
 
-    TW_ORM_week7
-    janedoe
-
-
-
-##### This file is ultimately going to be ignored by Git.
-
-    4. Please, install PrettyTable library with the following command:
-######sudo pip install prettytable
-
-##### Thank you for your contribution!
+##### Thank you for your attention!

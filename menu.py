@@ -2,7 +2,7 @@ from models import *
 from collections import OrderedDict
 
 
-class Menu:
+class Menu(object):
 
     @staticmethod
     def administrator_menu_loop():
@@ -46,7 +46,8 @@ class Menu:
     def mentor_menu_loop():
         """Mentor menu."""
         print("----MENTOR MENU----")
-        Mentor.check_valid_mentor()
+        print("Press 'q' to exit!")
+        Mentor.check_valid_mentor(input("Enter name: "))
         mentor_menu = OrderedDict([
             ('1', Mentor.display_mentor_interviews),
         ])

@@ -1,11 +1,11 @@
+from connection import Connection
 from peewee import *
 import random
-from dbconnection import DbConnection
 from prettytable import PrettyTable
 from emailsender import *
 
-user_data = DbConnection.open_file('db_config.txt')
-db = PostgresqlDatabase(user_data[0].strip('\n'), user=user_data[1])
+connection = Connection()
+db = PostgresqlDatabase(connection.database_name, user=connection.database_user)
 
 
 class BaseModel(Model):
@@ -42,7 +42,6 @@ class Person(BaseModel):
     @classmethod
     def email_generator(cls):
         """Generates random e-mail addresses for default applicants."""
-        # email_address = 'testerzh1234@gmail.com'
 
         for person in cls.select():
             if person.email is not None:
@@ -61,9 +60,8 @@ class Mentor(Person):
     mentor = None
 
     @classmethod
-    def check_valid_mentor(cls):
-        print("Press 'q' to exit!")
-        mentor_name = input("Enter name: ")
+    def check_valid_mentor(cls, mentor_input):
+        mentor_name = mentor_input
         av_mentors = {}
         i = 0
         for name in cls.mentor_name_list():
@@ -92,51 +90,43 @@ class Mentor(Person):
 
     @staticmethod
     def mentor_name_list():
-        mentor_name_list = [mentor.first_name + " " + mentor.last_name for mentor in Mentor.select()]
+        mentor_name_list = [mentor.full_name for mentor in Mentor.select()]
         return mentor_name_list
 
     @classmethod
     def display_mentor_interviews(cls):
         """Display interviews."""
+
+        # data for submenu handling filters
+        options = [['1', 'yyyy-mm-dd: '],
+                   ['2', "hh:mm: "],
+                   ['3', "hh:mm: "],
+                   ['4', "Application code: "],
+                   ['5', "Name: "]]
         try:
             Mentor.display_pretty_table_mentor_interview()
-
             a = None
             while a != 'q':
                 print("Press 'q' to exit menu.\nFilter by:")
                 print("1) Date    2) Start    3) End   4) Application code   5) Name")
-                a = input("Choice:")
-                if a == '1':
-                    try:
-                        b = input("yyyy-mm-dd: ")
-                        Mentor.display_pretty_table_mentor_interview(InterviewSlot.date == b)
-                    except (DataError, InternalError):
-                        print('Invalid input.')
-                elif a == '2':
-                    try:
-                        b = input("hh:mm: ")
-                        Mentor.display_pretty_table_mentor_interview(InterviewSlot.start == b)
-                    except (DataError, InternalError):
-                        print('Invalid input.')
-                elif a == '3':
-                    try:
-                        b = input("hh:mm: ")
-                        Mentor.display_pretty_table_mentor_interview(InterviewSlot.end == b)
-                    except (DataError, InternalError):
-                        print("Invalid input.")
-                elif a == '4':
-                    try:
-                        b = input("Application code: ")
-                        Mentor.display_pretty_table_mentor_interview(InterviewSlot.related_applicant.contains(b))
-                    except (DataError, InternalError):
-                        print("Invalid input.")
-                elif a == '5':
-                    try:
-                        b = input("Name: ")
-                        Mentor.display_pretty_table_mentor_interview(Applicant.first_name.contains(b) |
-                                                                     Applicant.last_name.contains(b))
-                    except (DataError, InternalError):
-                        print("Invalid input.")
+                a = input("Choice: ")
+                try:
+                    for option in options:
+                        if a == option[0]:
+                            b = input(option[1])
+                            if a == '1':
+                                Mentor.display_pretty_table_mentor_interview(InterviewSlot.date == b)
+                            elif a == '2':
+                                Mentor.display_pretty_table_mentor_interview(InterviewSlot.start == b)
+                            elif a == '3':
+                                Mentor.display_pretty_table_mentor_interview(InterviewSlot.end.contains(b))
+                            elif a == '4':
+                                Mentor.display_pretty_table_mentor_interview(InterviewSlot.related_applicant.contains(b))
+                            elif a == '5':
+                                Mentor.display_pretty_table_mentor_interview(Applicant.first_name.contains(b) |
+                                                                             Applicant.last_name.contains(b))
+                except (DataError, InternalError):
+                    print("Invalid input.")
         except Applicant.DoesNotExist:
             print("No scheduled interview.")
 
@@ -226,25 +216,21 @@ class Applicant(Person):
             if applicant.app_code is None:
                 applicant.app_code = cls.app_code_generate(cls.app_code_list())
                 applicant.save()
-                print("{} {} received a new application code: {}".format(applicant.first_name,
-                                                                         applicant.last_name,
-                                                                         applicant.app_code))
-                message = """
-Dear {0}!
+                print("{} received a new application code: {}".format(applicant.full_name,
+                                                                      applicant.app_code))
 
-We gladly received your application. First of all, we have generated a personal application code for you. Here it is:
-{1}.
+                # list of personal data to fill in the appropriate email messages
+                data_for_email = [applicant.full_name,
+                                  applicant.app_code,
+                                  applicant.location.loc_school]
 
-If everything goes fine with your application process, you're going to be informed about your interview's details soon.
-One thing for sure, it is probably going to be held in {2}.
-
-We're looking forward to meeting with you!
-
-Yours sincerely,
-CC Staff
-""".format(applicant.full_name, applicant.app_code, applicant.location.loc_school)
-                emailsender = EmailSender(email_receiver=applicant.email, text=message)
-                emailsender.sending()
+                # sending email process' just started
+                emailing_1 = EmailSender(email_receiver=applicant.email,
+                                         email_address=connection.email_address,
+                                         email_password=connection.email_password,
+                                         specialisation=data_for_email)
+                emailing_1.sending(emailing_1.create_email_text('applicant_start_email'))
+                emailing_1.end_of_sending_process()
             else:
                 pass
 
@@ -286,40 +272,25 @@ CC Staff
                         iview.save()
                         found = True
 
-                        message = """
-                        Dear {0}!
+                        # email sending process starts here
+                        data_for_email = [
+                            applicant.full_name,
+                            applicant.location.loc_school,
+                            Mentor.select().join(InterviewSlot)
+                            .where(InterviewSlot.related_applicant == applicant.app_code).get().first_name + " " +
+                            Mentor.select().join(InterviewSlot).where(InterviewSlot.related_applicant == applicant.app_code).get().last_name,
+                            InterviewSlot.select().where(InterviewSlot.related_applicant == applicant.app_code).get().date,
+                            InterviewSlot.select().where(InterviewSlot.related_applicant == applicant.app_code).get().start,
+                            InterviewSlot.select().where(InterviewSlot.related_applicant == applicant.app_code).get().end]
 
-                        The next step in your Codecool application process is just on your doorstep!
-                        We have scheduled an interview slot for your.
-
-                        Details:
-
-                        Location: {1}
-                        Related mentor's name: {2}
-                        Date: {3}
-                        Time/start: {4}
-                        Time/end: {5}
-
-                        We're really looking forward to meeting with you!
-
-                        Yours sincerely,
-                        CC Staff
-                        """.format(applicant.full_name,
-                                   applicant.location.loc_school,
-                                   Mentor.select().join(InterviewSlot)
-                                   .where(InterviewSlot.related_applicant == applicant.app_code).get().first_name + " " +
-                                   Mentor.select().join(InterviewSlot).where(InterviewSlot.related_applicant == applicant.app_code).get().last_name,
-                                   InterviewSlot.select().where(InterviewSlot.related_applicant == applicant.app_code).get().date,
-                                   InterviewSlot.select().where(InterviewSlot.related_applicant == applicant.app_code).get().start,
-                                   InterviewSlot.select().where(InterviewSlot.related_applicant == applicant.app_code).get().end,
-                                   )
-                        emailsender = EmailSender(email_receiver=applicant.email, text=message)
-                        emailsender.sending()
-                        print("{0}\'s just received an interview slot.".format(applicant.full_name))
+                        emailing_2 = EmailSender(email_receiver=applicant.email,
+                                                 email_address=connection.email_address,
+                                                 email_password=connection.email_password,
+                                                 specialisation=data_for_email)
+                        emailing_2.sending(emailing_2.create_email_text('applicant_interview_email'))
+                        emailing_2.end_of_sending_process()
 
                         break
-
-
             else:
                 found = True
             if not found:
@@ -358,7 +329,7 @@ CC Staff
         while a != 'q':
             print("Press 'q' to exit menu.\nFilter by:")
             print("1) Status    2) Time    3) Location   4) Full name   5) Email   6) School   7) Mentor")
-            a = input("Choice:")
+            a = input("Choice: ")
             if a == '1':
                 b = input("1) new\n2) In progress\n3) rejected\nChoice: ")
                 try:
@@ -397,7 +368,7 @@ CC Staff
                 b = input("Enter email: ")
                 Applicant.display_pretty_table_applicants(Applicant.email.contains(b))
             elif a == '6':
-                b = input("1) CC_BP   2) CC_M   3) CC_K\nChoice:")
+                b = input("1) CC_BP   2) CC_M   3) CC_K\nChoice: ")
                 try:
                     if b == '1':
                         c = "CC_BP"
@@ -448,7 +419,7 @@ class InterviewSlot(BaseModel):
         while a != 'q':
             print("Press 'q' to exit menu.\nFilter by:")
             print("1) School    2) Application code    3) Mentor   4) Date")
-            a = input("Choice:")
+            a = input("Choice: ")
             if a == '1':
                 b = input("1) CC_BP\n2) CC_M\n3) CC_K\nChoice: ")
                 try:
@@ -491,7 +462,7 @@ class InterviewSlot(BaseModel):
                                          Mentor.first_name.concat(" ").concat(Mentor.last_name),
                                          InterviewSlot.date).join(Mentor).join(School)\
                                         .where(InterviewSlot.related_applicant != None).tuples()
-        elif filters is not None:
+        else:
             basic = InterviewSlot.select(School.name,
                                          InterviewSlot.related_applicant,
                                          Mentor.first_name.concat(" ").concat(Mentor.last_name),
