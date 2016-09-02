@@ -3,7 +3,6 @@ import json
 import os.path
 
 
-
 # configuration settings
 class Connection(object):
     """Reads in data for personal connections."""
