@@ -9,7 +9,7 @@ body {
 .container.login {
     background-color: rgba(57, 116, 190, 0.7);
     width: 30%;
-    height: 45%;
+    height: 320px;
     position: absolute;
     top: 30%;
     bottom: 30%;
