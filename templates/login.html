@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>School System Login</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-default hidden-sm-up">        <!-- NAVIGATION BAR -->
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand hidden-xs-xs-down">
+                    <img alt="Brand" src="../img/logo@2x.png">
+                </a>
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div> <!-- navbar-header -->
+            <div class="collapse login" id="myNavbar">
+                <ul>
+                    <form action="/login" method="post">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input class="form-control" type="text" name="username" id="username" placeholder="user@mail.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input class="form-control" type="text" name="password" id="password" placeholder="********">
+                        </div>
+                        <div>
+                            <button class="btn btn-block btn-default" type="submit">Login</button>
+                        </div>
+                    </form>
+                </ul>
+            </div> <!-- collapse -> myNavbar -->
+        </div> <!-- container-fluid -->
+    </nav>                                                  <!-- /NAVIGATION BAR -->
+    <div class="container login hidden-xs-down">
+        <div class="row col-mg-6 col-mg-offset-3">
+
+            <h1 class="loginstr"><strong>Log in</strong></h1><br>
+
+            <form action="/login" method="post">
+
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input class="form-control" type="text" name="username" id="username" placeholder="user@mail.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input class="form-control" type="text" name="password" id="password" placeholder="********">
+                </div>
+
+                <div>
+                    <button class="btn btn-block btn-default" type="submit">Login</button>
+                </div>
+
+            </form>
+        </div> <!-- row col-mg-6 col-mg-offset-3 -->
+    </div> <!-- container login -->
+</body>

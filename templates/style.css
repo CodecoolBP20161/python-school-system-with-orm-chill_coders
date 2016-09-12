@@ -1,0 +1,52 @@
+body {
+    background-image: url("https://codecoolstatic.s3.amazonaws.com/wp-content/uploads/2016/06/codecool_teamwork.jpg");
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    background-size: cover;
+}
+
+.container.login {
+    background-color: rgba(57, 116, 190, 0.7);
+    width: 30%;
+    height: 45%;
+    position: absolute;
+    top: 30%;
+    bottom: 30%;
+    left: 0;
+    right: 0;
+    border-radius: 5px;
+    margin: auto;
+    padding: 0 -5% -5% 0;
+}
+
+.loginstr {
+    margin-left: 5%;
+}
+
+.form-group {
+    margin: 0 5% 5% 5%;
+}
+
+.btn-block {
+    width: 90%;
+    margin-left: 5%;
+}
+
+@media (max-width: 543px) {
+  .hidden-xs-down {
+    display: none !important;
+  }
+}
+
+@media (min-width: 544px) {
+  .hidden-sm-up {
+    display: none !important;
+  }
+}
+
+@media (max-width: 251px) {
+  .hidden-xs-xs-down {
+    display: none !important;
+  }
+}
