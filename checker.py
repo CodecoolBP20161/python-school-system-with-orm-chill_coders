@@ -14,6 +14,7 @@ class Check(object):
                 len(email[0]) > 0 and
                 ' ' not in e_mail)
 
+
     @classmethod
     def checker(cls, first_name, last_name, email):
         checklist = []

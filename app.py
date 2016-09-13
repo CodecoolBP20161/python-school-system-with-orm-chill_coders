@@ -1,6 +1,7 @@
-from flask import Flask, request, flash, redirect, url_for, render_template
+from flask import Flask, request, flash, redirect, url_for, render_template, session, escape
 from models import *
 from checker import Check
+import os
 
 app = Flask(__name__)
 
@@ -23,7 +24,9 @@ def _db_close(exc):
 # Homepage
 @app.route('/')
 def index():
-    return 'You\'ve just got your application code! Please, check out your mailbox to log in.'
+    if 'username' in session:
+        return 'Logged in as %s' % escape(session['username'])
+    return 'You are not logged in'
 
 
 # Sign up --- registration form
@@ -48,6 +51,7 @@ def reg_confirmation():
 
             # SENDING E_MAILS TO NEWBIES
             Applicant.add_app_code()
+            flash('You\'ve just got your application code! Please, check out your mailbox to log in.')
             return redirect('/')
 
         # ERROR IN CHECKER, RETURNS REG.FORM TEMPLATE WITH ERRORS
@@ -63,5 +67,44 @@ def reg_confirmation():
                                cities=City.select(),
                                error=False)
 
+
+# Login
+@app.route('/applicant/login', methods=['GET', 'POST'])
+def login():
+    """Handles applicants' login page"""
+
+    if request.method == 'POST':
+
+        # Log in without any problem --- session logged-in
+        if Applicant.get().where(email=request.form['email'].lstrip(),
+                                 app_code=request.form['app_code'].lstrip().uppercase()):
+            session['user'] = request.form['app_code']
+            flash('Successfully logged in!')
+            return redirect('/', error=False)
+
+        # if log in fails
+        else:
+            # mistype in e-mail address
+            if Check.email_check(request.form['email'].lstrip()) is False:
+                flash('Not a valid e-mail address.')
+            # cannot find data in database
+            else:
+                flash('Invalid e-mail address and application code pair. Please try again!')
+            return redirect('/applicant/login', error=True)
+
+    # Displays login page with blank boxes
+    else:
+        return render_template('login.html')
+
+@app.route('/applicant/logout', methods=['POST'])
+def logout():
+    """Handles logout"""
+
+    # remove the user from the session if it's there
+    session.pop('user', None)
+    return redirect('/')
+
+
 if __name__ == '__main__':
+    app.secret_key = os.urandom(24)
     app.run()
