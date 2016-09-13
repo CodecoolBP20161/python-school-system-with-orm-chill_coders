@@ -20,28 +20,48 @@ def _db_close(exc):
         db.close()
 
 
+# Homepage
 @app.route('/')
 def index():
-    return redirect("https://media.giphy.com/media/10Shl99Vghh5aU/giphy.gif")
+    return 'You\'ve just got your application code! Please, check out your mailbox to log in.'
 
 
+# Sign up --- registration form
 @app.route('/registration', methods=['GET', 'POST'])
 def reg_confirmation():
     """Displays and edits registration form"""
-    cities = City.select()
+
     if request.method == "POST":
-        b = (request.form['first_name'], request.form['last_name'], request.form['e_mail'], request.form['location'])
-        a = Check.checker(b[0], b[1], b[2])
-        if a[:] == [True, True, True]:  # GOOD FORM, CREATES NEW FORM
+        incoming_data = (request.form['first_name'],
+                         request.form['last_name'],
+                         request.form['e_mail'],
+                         request.form['location'])
+
+        list_of_booleans = Check.checker(incoming_data[0], incoming_data[1], incoming_data[2])
+
+        # GOOD FORM, CREATES NEW FORM
+        if list_of_booleans[:] == [True, True, True]:
             Applicant.create(first_name=request.form['first_name'],
                              last_name=request.form['last_name'],
                              location=request.form['location'],
                              email=request.form['e_mail'])
+
+            # SENDING E_MAILS TO NEWBIES
+            Applicant.add_app_code()
             return redirect('/')
-        else:  # ERROR IN CHECKER, RETURNS REG.FORM TEMPLATE WITH ERRORS
-            return render_template('registration_form.html', cities=cities, error=True, valid=a, words=b)
-    else:  # GET
-        return render_template('registration_form.html', cities=cities, error=False)
+
+        # ERROR IN CHECKER, RETURNS REG.FORM TEMPLATE WITH ERRORS
+        else:
+            return render_template('registration_form.html',
+                                   cities=City.select(),
+                                   error=True,
+                                   valid=list_of_booleans,
+                                   words=incoming_data)
+    # GET
+    else:
+        return render_template('registration_form.html',
+                               cities=City.select(),
+                               error=False)
 
 if __name__ == '__main__':
     app.run()
