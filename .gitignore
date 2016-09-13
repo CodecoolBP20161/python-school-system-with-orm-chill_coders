@@ -97,3 +97,4 @@ config.json
 # ignoring virtualenvironment
 wenv/
 
+/templates/bootstrap.css
