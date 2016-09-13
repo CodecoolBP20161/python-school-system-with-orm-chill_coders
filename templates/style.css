@@ -33,6 +33,27 @@ body {
     margin-left: 5%;
 }
 
+.mynav, .mynav_collapse {
+    color: #2f2f2f;
+    padding: 15px;
+}
+
+.mynav {
+    display: inline-block;
+}
+
+.mynav:hover, .mynav_collapse:hover {
+    color: #2f2f2f;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+
+.mynav_collapse {
+    text-align: center;
+    display: block;
+}
+
+
 @media (max-width: 543px) {
   .hidden-xs-down {
     display: none !important;
@@ -45,8 +66,15 @@ body {
   }
 }
 
-@media (max-width: 251px) {
+@media (max-width: 250px) {
   .hidden-xs-xs-down {
     display: none !important;
   }
 }
+
+@media (max-width: 322px) {
+  .hidden-xs-home-down {
+    display: none !important;
+  }
+}
+
