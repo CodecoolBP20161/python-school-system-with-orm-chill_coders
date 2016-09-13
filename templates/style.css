@@ -1,0 +1,80 @@
+body {
+    background-image: url("https://codecoolstatic.s3.amazonaws.com/wp-content/uploads/2016/06/codecool_teamwork.jpg");
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    background-size: cover;
+}
+
+.container.login {
+    background-color: rgba(57, 116, 190, 0.7);
+    width: 30%;
+    height: 320px;
+    position: absolute;
+    top: 30%;
+    bottom: 30%;
+    left: 0;
+    right: 0;
+    border-radius: 5px;
+    margin: auto;
+    padding: 0 -5% -5% 0;
+}
+
+.loginstr {
+    margin-left: 5%;
+}
+
+.form-group {
+    margin: 0 5% 5% 5%;
+}
+
+.btn-block {
+    width: 90%;
+    margin-left: 5%;
+}
+
+.mynav, .mynav_collapse {
+    color: #2f2f2f;
+    padding: 15px;
+}
+
+.mynav {
+    display: inline-block;
+}
+
+.mynav:hover, .mynav_collapse:hover {
+    color: #2f2f2f;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+
+.mynav_collapse {
+    text-align: center;
+    display: block;
+}
+
+
+@media (max-width: 543px) {
+  .hidden-xs-down {
+    display: none !important;
+  }
+}
+
+@media (min-width: 544px) {
+  .hidden-sm-up {
+    display: none !important;
+  }
+}
+
+@media (max-width: 250px) {
+  .hidden-xs-xs-down {
+    display: none !important;
+  }
+}
+
+@media (max-width: 322px) {
+  .hidden-xs-home-down {
+    display: none !important;
+  }
+}
+
