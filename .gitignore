@@ -98,3 +98,4 @@ config.json
 wenv/
 
 /templates/bootstrap.css
+/bootstrap/
