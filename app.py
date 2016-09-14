@@ -1,9 +1,10 @@
-from flask import Flask, request, flash, redirect, url_for, render_template, session, escape
+from flask import Flask, request, flash, redirect, url_for, render_template, escape, session
 from models import *
 from checker import Check
 import os
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
 
 
 # This hook ensures that a connection is opened to handle any queries
@@ -24,9 +25,10 @@ def _db_close(exc):
 # Homepage
 @app.route('/')
 def index():
-    if 'username' in session:
-        return 'Logged in as %s' % escape(session['username'])
-    return 'You are not logged in'
+    if 'user' in session:
+        return 'Logged in as %s' % escape(session['user'])
+    else:
+        return 'You are not logged in'
 
 
 # Sign up --- registration form
@@ -51,7 +53,7 @@ def reg_confirmation():
 
             # SENDING E_MAILS TO NEWBIES
             Applicant.add_app_code()
-            flash('You\'ve just got your application code! Please, check out your mailbox to log in.')
+            # 'You\'ve just got your application code! Please, check out your mailbox to log in.'
             return redirect('/')
 
         # ERROR IN CHECKER, RETURNS REG.FORM TEMPLATE WITH ERRORS
@@ -76,35 +78,34 @@ def login():
     if request.method == 'POST':
 
         # Log in without any problem --- session logged-in
-        if Applicant.get().where(email=request.form['email'].lstrip(),
-                                 app_code=request.form['app_code'].lstrip().uppercase()):
+        if Applicant.select().where(Applicant.email == request.form['email'].lstrip(),
+                                    Applicant.app_code == request.form['app_code'].lstrip().upper()):
             session['user'] = request.form['app_code']
-            flash('Successfully logged in!')
-            return redirect('/', error=False)
+            session['logged_in'] = True
+
+            return redirect('/')
 
         # if log in fails
         else:
             # mistype in e-mail address
             if Check.email_check(request.form['email'].lstrip()) is False:
-                flash('Not a valid e-mail address.')
+                return 'Not a valid e-mail address.'
             # cannot find data in database
             else:
-                flash('Invalid e-mail address and application code pair. Please try again!')
-            return redirect('/applicant/login', error=True)
+                return 'Invalid e-mail address and application code pair. Please try again!'
 
     # Displays login page with blank boxes
     else:
         return render_template('login.html')
 
-@app.route('/applicant/logout', methods=['POST'])
+
+@app.route('/applicant/logout', methods=['GET'])
 def logout():
     """Handles logout"""
 
-    # remove the user from the session if it's there
     session.pop('user', None)
     return redirect('/')
 
 
 if __name__ == '__main__':
-    app.secret_key = os.urandom(24)
-    app.run()
+    app.run(debug=True)
