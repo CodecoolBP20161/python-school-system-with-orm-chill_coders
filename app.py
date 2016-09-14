@@ -26,9 +26,9 @@ def _db_close(exc):
 @app.route('/')
 def index():
     if 'user' in session:
-        return 'Logged in as %s' % escape(session['user'])
+        return 'Logged in as %s!' % escape(session['user'])
     else:
-        return 'You are not logged in'
+        return 'You are not logged in!'
 
 
 # Sign up --- registration form
@@ -76,27 +76,34 @@ def login():
     """Handles applicants' login page"""
 
     if request.method == 'POST':
+        # mistype in e-mail address --- wrong syntax
+        if Check.email_check(request.form['email'].lstrip()) is False:
+            return 'Not a valid e-mail address. Try again!'
 
-        # Log in without any problem --- session logged-in
-        if Applicant.select().where(Applicant.email == request.form['email'].lstrip(),
-                                    Applicant.app_code == request.form['app_code'].lstrip().upper()):
-            session['user'] = request.form['app_code']
-            session['logged_in'] = True
-
-            return redirect('/')
-
-        # if log in fails
+        # looking for data in database
         else:
-            # mistype in e-mail address
-            if Check.email_check(request.form['email'].lstrip()) is False:
-                return 'Not a valid e-mail address.'
-            # cannot find data in database
-            else:
+            try:
+                applicant = Applicant.select().where(Applicant.email == request.form['email'].lstrip(),
+                                                     Applicant.app_code == request.form['app_code'].lstrip().upper()).get()
+
+                # Log in without any problem --- session logged-in --- saving all the necessary data
+                session['app_code'] = applicant.app_code
+                session['email'] = applicant.email
+                session['user'] = applicant.full_name
+                session['logged_in'] = True
+
+                return redirect('/')
+
+            except DoesNotExist:
+                # cannot find data in database
                 return 'Invalid e-mail address and application code pair. Please try again!'
 
     # Displays login page with blank boxes
     else:
         return render_template('login.html')
+
+
+
 
 
 @app.route('/applicant/logout', methods=['GET'])
