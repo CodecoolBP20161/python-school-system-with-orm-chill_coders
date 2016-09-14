@@ -1,8 +1,10 @@
-from flask import Flask, request, flash, redirect, url_for, render_template
+from flask import Flask, request, flash, redirect, url_for, render_template, escape, session
 from models import *
 from checker import Check
+import os
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
 
 
 # This hook ensures that a connection is opened to handle any queries
@@ -20,28 +22,96 @@ def _db_close(exc):
         db.close()
 
 
+# Homepage
 @app.route('/')
 def index():
-    return redirect("https://media.giphy.com/media/10Shl99Vghh5aU/giphy.gif")
+    if 'user' in session:
+        # return 'Logged in as %s!' % escape(session['user'])
+        return render_template("home.html", logged=True)
+    else:
+        return render_template("home.html", logged=False)
 
 
+# Sign up --- registration form
 @app.route('/registration', methods=['GET', 'POST'])
 def reg_confirmation():
     """Displays and edits registration form"""
-    cities = City.select()
+
     if request.method == "POST":
-        b = (request.form['first_name'], request.form['last_name'], request.form['e_mail'], request.form['location'])
-        a = Check.checker(b[0], b[1], b[2])
-        if a[:] == [True, True, True]:  # GOOD FORM, CREATES NEW FORM
+        incoming_data = (request.form['first_name'],
+                         request.form['last_name'],
+                         request.form['e_mail'],
+                         request.form['location'])
+
+        list_of_booleans = Check.checker(incoming_data[0], incoming_data[1], incoming_data[2])
+
+        # GOOD FORM, CREATES NEW FORM
+        if list_of_booleans[:] == [True, True, True]:
             Applicant.create(first_name=request.form['first_name'],
                              last_name=request.form['last_name'],
                              location=request.form['location'],
                              email=request.form['e_mail'])
+
+            # SENDING E_MAILS TO NEWBIES
+            Applicant.add_app_code()
+            # 'You\'ve just got your application code! Please, check out your mailbox to log in.'
             return redirect('/')
-        else:  # ERROR IN CHECKER, RETURNS REG.FORM TEMPLATE WITH ERRORS
-            return render_template('registration_form.html', cities=cities, error=True, valid=a, words=b)
-    else:  # GET
-        return render_template('registration_form.html', cities=cities, error=False)
+
+        # ERROR IN CHECKER, RETURNS REG.FORM TEMPLATE WITH ERRORS
+        else:
+            return render_template('registration_form.html',
+                                   cities=City.select(),
+                                   error=True,
+                                   valid=list_of_booleans,
+                                   words=incoming_data)
+    # GET
+    else:
+        return render_template('registration_form.html',
+                               cities=City.select(),
+                               error=False)
+
+
+# Login
+@app.route('/applicant/login', methods=['GET', 'POST'])
+def login():
+    """Handles applicants' login page"""
+
+    if request.method == 'POST':
+        # mistype in e-mail address --- wrong syntax
+        if Check.email_check(request.form['email'].lstrip()) is False:
+            return render_template('login.html', error="syntax")
+
+        # looking for data in database
+        else:
+            try:
+                applicant = Applicant.select().where(Applicant.email == request.form['email'].lstrip(),
+                                                     Applicant.app_code == request.form['app_code'].lstrip().upper()).get()
+
+                # Log in without any problem --- session logged-in --- saving all the necessary data
+                session['app_code'] = applicant.app_code
+                session['email'] = applicant.email
+                session['user'] = applicant.full_name
+                session['logged_in'] = True
+
+                return redirect('/')
+
+            except DoesNotExist:
+                # cannot find data in database
+                return render_template('login.html', error=True)
+
+    # Displays login page with blank boxes
+    else:
+        return render_template('login.html')
+
+
+@app.route('/applicant/logout', methods=['GET'])
+def logout():
+    """Handles logout"""
+
+    session.pop('user', None)
+    return redirect('/')
+
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
+

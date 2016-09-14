@@ -1,75 +1,164 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Registration form</title>
-</head>
-<body>
-    <h1>Registration form for new applicants</h1>
-    <h2>Please fill the fields below</h2>
-    <form action="/registration" method="post">
+{% extends "index.html" %}
+{% block body %}
+    <nav class="navbar navbar-default">        <!-- NAVIGATION BAR -->
+        <div class="container-fluid">
+            <div class="navbar-header">
 
-<!--Here starts the block with no error!-->
-        {% if not error %}
+                <a class="navbar-brand hidden-xs-xs-down"><img alt="Brand" src="../static/logo@2x.png"></a>
 
-        <p>First name</p>
-            <p><input type="text" name="first_name"></p>
-        <p>Last name</p>
-            <p><input type="text" name="last_name"></p>
-        <p>Location</p>
-        <select name="location">
-            {% for city in cities %}
-                <option value="{{ city.id }}">{{ city.loc_examples }}</option>
-            {% endfor %}
-        </select>
-        <p>E-mail address</p>
-            <p><input type="text" name="e_mail"></p>
-        <p><input type="submit" value="Submit"></p>
+                <a href="{{ url_for('index') }}" class="hidden-xs-down"><div class="mynav">Home</div></a>
+                {% if logged %}
+                <a href="{{ url_for('logout') }}" class="hidden-xs-down"><div class="mynav">Log Out</div></a>
+                {% endif %}
+                {% if not logged %}
+                <a href="{{ url_for('login') }}" class="hidden-xs-down"><div class="mynav">Log In</div></a>
+                <a href="{{ url_for('reg_confirmation') }}" class="hidden-xs-down"><div class="mynav current">Sign Up</div></a>
+                {% endif %}
 
-        {% endif %}
-<!--Here ends the block with no error!-->
+                <button type="button" class="navbar-toggle hidden-sm-up" data-toggle="collapse" data-target="#myNavbar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
 
-<!--Here starts the block if there's some error!-->
-        {% if error %}
-            <p>First name</p>
-                <p>
-                    <input
-                            type="text"
-                            name="first_name"
-                            value="{{ words[0] }}"
-                            {% if not valid[0] %} style="color:red;" {% endif %}>
-                    {% if not valid[0] %} First letter should be capital, use letters only! {% endif %}
-                </p>
+            </div> <!-- navbar-header -->
+            <div class="collapse login" id="myNavbar">
+                <ul>
+                    <a href="{{ url_for('index') }}"><div class="mynav_collapse">Home</div></a>
+                    {% if logged %}
+                    <a href="{{ url_for('logout') }}"><div class="mynav_collapse current">Log Out</div></a>
+                    {% endif %}
+                    {% if not logged %}
+                    <a href="{{ url_for('login') }}"><div class="mynav_collapse">Log In</div></a>
+                    <a href="{{ url_for('reg_confirmation') }}"><div class="mynav_collapse current">Sign Up</div></a>
+                    {% endif %}
 
-            <p>Last name</p>
-                <p>
-                    <input
-                            type="text"
-                            name="last_name"
-                            value="{{ words[1] }}"
-                            {% if not valid[1] %} style="color:red;" {% endif %} >
-                    {% if not valid[1] %} First letter should be capital, use letters only! {% endif %}
-                </p>
+                    <form action="/registration" method="post">
 
-            <p>Location</p>
-            <select name="location">
-                {% for city in cities %}
-                    <option
-                            value="{{ city.id }}" {% if city.id == words[3]|int %} selected {% endif %}>
-                        {{ city.loc_examples }}
-                    </option>
-                {% endfor %}
-            </select>
-            <p>E-mail address</p>
-                <p>
-                    <input
-                            type="text"
-                            name="e_mail"
-                            value="{{ words[2] }}"
-                            {% if not valid[2] %} style="color:red;" {% endif %} >
-                    {% if not valid[2] %} This is not a valid e-mail address! {% endif %}
-                </p>
-            <p><input type="submit" value="Submit"></p>
-        {% endif %}
-    </form>
+                        <div class="form-group">
+                            <label for="first_name" class="str">First name</label>
+                            <input class="form-control" type="text" name="first_name" id="first_name" placeholder="First Name" required>
+                        </div>
+
+                        {% if error %}
+                            {% if not valid[0] %}
+                        <div class="alert alert-warning">
+                            <strong>Warning!</strong> First letter should be capital, use letters only!: {{ words[0] }}
+                        </div>
+                            {% endif %}
+                        {% endif %}
+
+
+                        <div class="form-group">
+                            <label for="last_name" class="str">Last name</label>
+                            <input class="form-control" type="text" name="last_name" id="last_name" placeholder="Last Name" required>
+                        </div>
+
+                        {% if error %}
+                            {% if not valid[1] %}
+                        <div class="alert alert-warning">
+                            <strong>Warning!</strong> First letter should be capital, use letters only!: {{ words[1] }}
+                        </div>
+                            {% endif %}
+                        {% endif %}
+
+
+                       <div class="form-group">
+                            <label for="location" class="str">Location</label>
+                            <select class="form-control" name="location" id="location">
+                                {% for city in cities %}
+                                    <option value="{{ city.id }}">{{ city.loc_examples }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email" class="str">E-mail</label>
+                            <input class="form-control" type="text" name="e_mail" id="email" placeholder="user@mail.com" required>
+                        </div>
+
+                        {% if error %}
+                            {% if not valid[2] %}
+                        <div class="alert alert-warning">
+                            <strong>Warning!</strong> not a valid e-mail address: {{ words[2] }}
+                        </div>
+                            {% endif %}
+                        {% endif %}
+
+                        <div>
+                            <button class="btn btn-block btn-default" type="submit">Submit</button>
+                        </div>
+
+                    </form>
+
+                </ul>
+            </div> <!-- collapse -> myNavbar -->
+        </div> <!-- container-fluid -->
+    </nav>                                                  <!-- /NAVIGATION BAR -->
+    <div class="container regform hidden-xs-down">            <!-- FORM -->
+        <div class="row col-mg-6 col-mg-offset-3 myrow">
+
+            <h2 class="loginstr"><strong>Registration Form</strong></h2>
+            <br><br>
+            <form action="/registration" method="post">
+
+                <div class="form-group">
+                    <label for="first_name">First name</label>
+                    <input class="form-control" type="text" name="first_name" id="first_name" placeholder="First Name" required>
+                </div>
+
+                {% if error %}
+                    {% if not valid[0] %}
+                <div class="alert alert-warning">
+                    <strong>Warning!</strong> First letter should be capital, use letters only!: {{ words[0] }}
+                </div>
+                    {% endif %}
+                {% endif %}
+
+
+                <div class="form-group">
+                    <label for="last_name">Last name</label>
+                    <input class="form-control" type="text" name="last_name" id="last_name" placeholder="Last Name" required>
+                </div>
+
+                {% if error %}
+                    {% if not valid[1] %}
+                <div class="alert alert-warning">
+                    <strong>Warning!</strong> First letter should be capital, use letters only!: {{ words[1] }}
+                </div>
+                    {% endif %}
+                {% endif %}
+
+
+               <div class="form-group">
+                    <label for="location">Location</label>
+                    <select class="form-control" name="location" id="location">
+                        {% for city in cities %}
+                            <option value="{{ city.id }}">{{ city.loc_examples }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <input class="form-control" type="text" name="e_mail" id="email" placeholder="user@mail.com" required>
+                </div>
+
+                {% if error %}
+                    {% if not valid[2] %}
+                <div class="alert alert-warning">
+                    <strong>Warning!</strong> not a valid e-mail address: {{ words[2] }}
+                </div>
+                    {% endif %}
+                {% endif %}
+
+                <div>
+                    <button class="btn btn-block btn-default" type="submit">Submit</button>
+                </div>
+
+            </form>
+        </div> <!-- row col-mg-6 col-mg-offset-3 -->
+    </div> <!-- container login -->
 </body>
+{% endblock %}
 </html>
