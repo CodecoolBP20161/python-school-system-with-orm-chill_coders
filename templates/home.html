@@ -7,15 +7,14 @@
 
                 <a class="navbar-brand hidden-xs-xs-down"><img alt="Brand" src="../static/logo@2x.png"></a>
 
-                <a href="{{ url_for('index') }}" class="hidden-xs-down"><div class="mynav">Home</div></a>
+                <a href="{{ url_for('index') }}" class="hidden-xs-down"><div class="mynav current">Home</div></a>
                 {% if logged %}
                 <a href="{{ url_for('logout') }}" class="hidden-xs-down"><div class="mynav">Log Out</div></a>
                 {% endif %}
                 {% if not logged %}
-                <a href="{{ url_for('login') }}" class="hidden-xs-down"><div class="mynav current">Log In</div></a>
+                <a href="{{ url_for('login') }}" class="hidden-xs-down"><div class="mynav">Log In</div></a>
                 <a href="{{ url_for('reg_confirmation') }}" class="hidden-xs-down"><div class="mynav">Sign Up</div></a>
                 {% endif %}
-
 
                 <button type="button" class="navbar-toggle hidden-sm-up" data-toggle="collapse" data-target="#myNavbar">
                     <span class="icon-bar"></span>
@@ -24,16 +23,17 @@
                 </button>
 
             </div> <!-- navbar-header -->
-            <div class="collapse login" id="myNavbar">
+            <span class="collapse login" id="myNavbar">
                 <ul>
-                    <a href="{{ url_for('index') }}"><div class="mynav_collapse">Home</div></a>
+                    <a href="{{ url_for('index') }}"><div class="mynav_collapse current">Home</div><span class="sr-only">(current)</span></a>
+
                     {% if logged %}
-                    <a href="{{ url_for('logout') }}"><div class="mynav_collapse current">Log Out</div></a>
+                    <a href="{{ url_for('logout') }}"><div class="mynav_collapse">Log Out</div><span class="sr-only"></span></a>
                     {% endif %}
+
                     {% if not logged %}
-                    <a href="{{ url_for('login') }}"><div class="mynav_collapse current">Log In</div></a>
-                    <a href="{{ url_for('reg_confirmation') }}"><div class="mynav_collapse">Sign Up</div></a>
-                    {% endif %}
+                    <a href="{{ url_for('reg_confirmation') }}"><div class="mynav_collapse">Sign Up</div><span class="sr-only"></span></a>
+
                     <form action="/applicant/login" method="post">
 
                         <div class="form-group">
@@ -64,49 +64,10 @@
                         </div>
 
                     </form>
-
+                    {% endif %}
                 </ul>
             </div> <!-- collapse -> myNavbar -->
         </div> <!-- container-fluid -->
-    </nav>                                                  <!-- /NAVIGATION BAR -->
-    <div class="container login hidden-xs-down">            <!-- LOGIN -->
-        <div class="row col-mg-6 col-mg-offset-3">
-
-            <h1 class="loginstr"><strong>Log in</strong></h1><br>
-
-            <form action="/applicant/login" method="post">
-
-                <div class="form-group">
-                    <label for="username">E-mail address</label>
-                    <input class="form-control" type="text" name="email" id="username" placeholder="user@mail.com">
-                </div>
-
-                <div class="form-group">
-                    <label for="password">Application code</label>
-                    <input class="form-control" type="password" name="app_code" id="password" placeholder="********">
-                </div>
-
-                {% if error %}
-                    <div class="alert alert-warning">
-                        <strong>Warning!</strong> Invalid email or application code!
-                    </div>
-                {% endif %}
-
-                {% if error == "syntax" %}
-                    <div class="alert alert-warning">
-                        <strong>Warning!</strong> Invalid email syntax!
-                    </div>
-                {% endif %}
-
-
-
-                <div>
-                    <button class="btn btn-block btn-default" type="submit">Login</button>
-                </div>
-
-            </form>
-        </div> <!-- row col-mg-6 col-mg-offset-3 -->
-    </div> <!-- container login -->
+    </nav><!-- /NAVIGATION BAR -->
 </body>
 {% endblock %}
-</html>

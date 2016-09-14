@@ -6,22 +6,34 @@ body {
     background-size: cover;
 }
 
+
+
 .container.login {
-    background-color: rgba(57, 116, 190, 0.7);
+    background-color: rgba(77, 209, 118, 0.8);
     width: 30%;
-    height: 320px;
-    position: absolute;
-    top: 30%;
-    bottom: 30%;
-    left: 0;
-    right: 0;
     border-radius: 5px;
-    margin: auto;
-    padding: 0 -5% -5% 0;
+    margin-top: 8%;
+}
+
+.container.regform {
+    background-color: rgba(77, 209, 118, 0.8);
+    width: 30%;
+    border-radius: 5px;
+    margin-top: 8%;
+
+}
+
+.str {
+    color: black;
+}
+
+label {
+    color: white;
 }
 
 .loginstr {
     margin-left: 5%;
+    color: white;
 }
 
 .form-group {
@@ -31,6 +43,12 @@ body {
 .btn-block {
     width: 90%;
     margin-left: 5%;
+    margin-bottom: 10px;
+}
+
+.current {
+    background-color: #d1d1d1;
+    border-radius: 5px;
 }
 
 .mynav, .mynav_collapse {
@@ -53,6 +71,13 @@ body {
     display: block;
 }
 
+.myrow {
+    margin-bottom: 15px;
+}
+
+.alert {
+    margin: 10px 5px;
+}
 
 @media (max-width: 543px) {
   .hidden-xs-down {

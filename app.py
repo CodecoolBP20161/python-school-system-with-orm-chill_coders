@@ -26,9 +26,10 @@ def _db_close(exc):
 @app.route('/')
 def index():
     if 'user' in session:
-        return 'Logged in as %s!' % escape(session['user'])
+        # return 'Logged in as %s!' % escape(session['user'])
+        return render_template("home.html", logged=True)
     else:
-        return 'You are not logged in!'
+        return render_template("home.html", logged=False)
 
 
 # Sign up --- registration form
@@ -78,7 +79,7 @@ def login():
     if request.method == 'POST':
         # mistype in e-mail address --- wrong syntax
         if Check.email_check(request.form['email'].lstrip()) is False:
-            return 'Not a valid e-mail address. Try again!'
+            return render_template('login.html', error="syntax")
 
         # looking for data in database
         else:
@@ -96,14 +97,11 @@ def login():
 
             except DoesNotExist:
                 # cannot find data in database
-                return 'Invalid e-mail address and application code pair. Please try again!'
+                return render_template('login.html', error=True)
 
     # Displays login page with blank boxes
     else:
         return render_template('login.html')
-
-
-
 
 
 @app.route('/applicant/logout', methods=['GET'])
@@ -116,3 +114,4 @@ def logout():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
