@@ -1,11 +1,12 @@
-class Check:
+class Check(object):
+    """Checks valid incoming data from web"""
 
     @staticmethod
-    def namecheck(name):
+    def name_check(name):
         return len(name) > 0 and name.isalpha() and not name[0].islower()
 
     @staticmethod
-    def emailcheck(e_mail):
+    def email_check(e_mail):
         email = e_mail.split('@')
         return (len(email) == 2 and
                 '.' in email[1] and
@@ -13,10 +14,11 @@ class Check:
                 len(email[0]) > 0 and
                 ' ' not in e_mail)
 
+
     @classmethod
     def checker(cls, first_name, last_name, email):
         checklist = []
-        checklist.append(cls.namecheck(first_name))
-        checklist.append(cls.namecheck(last_name))
-        checklist.append(cls.emailcheck(email))
+        checklist.append(cls.name_check(first_name))
+        checklist.append(cls.name_check(last_name))
+        checklist.append(cls.email_check(email))
         return checklist
